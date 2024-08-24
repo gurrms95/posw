@@ -37,10 +37,9 @@
 - Front : Thymeleaf, JavaScript, HTML, CSS, Bootstrap
 - Back-end : Spring Boot
 - DataBase : MariaDB
-- Library : jQuery
 - 버전 및 이슈관리 : Github, Github Project
 - 협업 툴 : Github
-- 서비스 배포 환경 : Tomcat
+- 서비스 배포 환경 : Tomcat, Oracle Cloud
 
 
 <br>
@@ -148,10 +147,11 @@
 |-----------|--------------------------------------------------------|
 | Language  | Java: OpenJDK 17 <br> HTML5 <br> CSS3 <br> JavaScript  |
 | Database  | MariaDB                                     |
-| Framework | Spring Boot: 3.3.0 <br> MyBatis <br> Thymeleaf |                                 |
-| Tool      | GitHub <br> Git Bash <br> MySQL Workbench: 8.0 <br>|
-| Server    | Tomcat: Provided by Spring Boot <br> AWS               |
-| Libraries | Gson: 2.10.1 <br> Jackson Databind: 2.16.1 <br> Jackson JSR310: 2.16.1 <br> Jackson XML: 2.16.1 <br> Log4j2 <br> Google Cloud Vision: 3.34.0 <br> Springdoc OpenAPI UI: 1.6.14 <br> Apache Commons Exec: 1.3 <br> Apache HttpClient 5: 5.2.1 |
+| Framework | Spring Boot: 3.3.0 <br> MyBatis <br> Thymeleaf |                                |
+| Server    | Tomcat: Provided by Spring Boot <br> Oracle Cloud              |
+| 공공데이터포탈 API   | 식품의약품안전처_의약품개요정보(e약은요) <br> 세종특별자치시_약국 현황  <br> 세종특별자치시_폐의약품 수거함 현황 <br>  식품의약품안전처_의약품안전사용서비스(DUR)품목정보 |
+| 기타 API    | Google Cloud Vision <br>  Google Geolocation <br>  Google Cloud Vision <br>  KakaoMap               |
+
 
 ## 4. 역할 분담
 
@@ -202,7 +202,7 @@
 
 - **기능**
     - 폐의약품 배출방법 안내, 폐의약품 수거함 위치 정보 제공
-    - 커뮤니티 및 공지사항 게시판 구현
+    - 커뮤니티 및 공지사항 게시판 구현 (서비스 준비중)
 - **기타**
     - Spring Boot 설정 및 Github 프로젝트 세팅
     - KAKAO Map API 연동
@@ -360,7 +360,7 @@
 
 ### [커뮤니티] 
 
-- 개발중
+- 서비스 준비중
   
 <br>
 
