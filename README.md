@@ -145,12 +145,12 @@
 
 | Category  | Details ............................................... |
 |-----------|--------------------------------------------------------|
-| Language  | Java: OpenJDK 17 <br> HTML5 <br> CSS3 <br> JavaScript  |
+| Language  | Java: OpenJDK 17 <br> HTML5 <br> CSS3 <br> JavaScript <br> Thymeleaf  |
 | Database  | MariaDB                                     |
-| Framework | Spring Boot: 3.3.0 <br> MyBatis <br> Thymeleaf |                                |
+| Framework | Spring Boot: 3.3.0 <br> MyBatis |                                |
 | Server    | Tomcat: Provided by Spring Boot <br> Oracle Cloud              |
 | 공공데이터포탈 API   | 식품의약품안전처_의약품개요정보(e약은요) <br> 세종특별자치시_약국 현황  <br> 세종특별자치시_폐의약품 수거함 현황 <br>  식품의약품안전처_의약품안전사용서비스(DUR)품목정보 |
-| 기타 API    | Google Cloud Vision <br>  Google Geolocation <br>  Google Cloud Vision <br>  KakaoMap               |
+| 기타 API    | Google Cloud Vision <br>  Google Geolocation <br>  KakaoMap               |
 
 
 ## 4. 역할 분담
