@@ -1,0 +1,262 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+    <div layout:fragment="content">
+        <!-- 화면 시작 -->
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <!-- Sidebar -->
+                            <div class="col-lg-3 col-md-4 mb-4">
+                                <div class="card">
+<!--                                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Profile Picture">-->
+                                    <img src="/img/user-profile.png" class="card-img-top" alt="Profile Picture">
+                                    <div class="card-body text-center">
+                                        <h5 th:if="${user}" th:text="${user.userKornNam}" class="card-title">홍길동</h5>
+                                        <p th:if="${user}" th:text="${user.userEmail}" class="card-text">홍길동@gmail.com (프로필사진, 이메일 수정 모달 표출)</p>
+
+                                        <h5 th:if="${user == null}" class="card-title">홍길동</h5>
+                                        <p th:if="${user == null}" class="card-text">홍길동@gmail.com (프로필사진, 이메일 수정 모달 표출)</p>
+
+                                        <a href="#" class="btn btn-primary">프로필 수정</a>
+                                    </div>
+                                </div>
+                                <ul class="list-group mt-3">
+                                    <li class="list-group-item"><a href="#" data-toggle="modal" data-target="#userInfoModal">개인정보 설정</a></li>
+                                    <li class="list-group-item"><a href="/taking/scheduleList">알람 설정</a></li>
+                                    <li class="list-group-item"><a href="#" data-toggle="modal" data-target="#passwordChangeModal">비밀번호 변경</a></li>
+                                    <li class="list-group-item"><a href="#" id="deleteUser">계정 삭제</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Main Content -->
+                            <div class="col-lg-9 col-md-8">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        최근 복용 내역
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li th:if="${tkDtlList.size() > 0}" th:each="tkList, iterStat : ${tkDtlList}" class="list-group-item"
+                                            th:text="${iterStat.index+1 + ') [' + tkList.takingNm + '] : ' + tkList.mediNm}">복용 내역</li>
+
+                                        <li th:if="${tkDtlList.size() < 1}" class="list-group-item">복용 내역 없음</li>
+                                    </ul>
+                                </div>
+
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        나의 포인트
+                                    </div>
+                                    <div class="card-body">
+                                        <p th:text="${'전체 점수: ' + envirRank.totalScore + '점 (랭킹 '+ envirRank.totalScoreRank + '위)'}">전체 점수</p>
+                                        <div class="progress" style="height: 40px;">
+                                            <div id="takingScore" class="progress-bar progress-bar-animated progress-bar-striped bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <div id="disposalScore" class="progress-bar progress-bar-animated progress-bar-striped bg-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <div id="attendScore" class="progress-bar progress-bar-animated progress-bar-striped bg-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        최근 로그인 기록
+                                    </div>
+                                    <div class="card-body">
+                                        <p th:if="${user.lasLoginDt}" th:text="${user.lasLoginDt} + '  (마지막 로그아웃)'">2024년 7월 31일 수요일 22:35:22 (UTC)</p>
+                                        <p th:if="${user.lasLoginDt == null}" >2024년 7월 31일 수요일 22:35:22 (UTC)</p>
+<!--                                        <a href="#" class="btn btn-secondary">더보기</a>-->
+                                    </div>
+                                </div>
+
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        고객 지원
+                                    </div>
+                                    <div class="card-body">
+                                        <a href="#" class="btn btn-info">문의하기</a>
+                                        <a href="#" class="btn btn-warning">공지사항 보기</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 개인정보 설정 모달 -->
+                        <div class="modal fade show" id="userInfoModal" tabindex="-1" role="dialog" aria-modal="true" style="padding-right: 17px; display: none;">
+                            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">개인정보 설정</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="userInfoForm" method="post">
+                                            <!-- 사용자 계정 아이디 -->
+                                            <div class="mb-3">
+                                                <label for="userId" class="form-label">사용자 계정 아이디</label>
+                                                <input type="text" class="form-control" id="userId" name="userId" th:value="${user.userId}" readonly>
+                                            </div>
+
+                                            <!-- 한글 성명 -->
+                                            <div class="mb-3">
+                                                <label for="userKorName" class="form-label">한글 성명</label>
+            <!--                                    <input type="text" class="form-control" id="userKorName" name="userKorName" th:value="${user.userKorName}" readonly>-->
+                                                <input type="text" class="form-control" id="userKorName" name="userKorName" readonly>
+                                            </div>
+
+                                            <!-- 영문 성명 -->
+                                            <div class="mb-3">
+                                                <label for="userEngName" class="form-label">영문 성명</label>
+            <!--                                    <input type="text" class="form-control" id="userEngName" name="userEngName" th:value="${user.userEngName}">-->
+                                                <input type="text" class="form-control" id="userEngName" name="userEngName" >
+                                            </div>
+
+                                            <!-- 전화번호 -->
+                                            <div class="mb-3">
+                                                <label for="userTelNo" class="form-label">전화번호</label>
+            <!--                                    <input type="text" class="form-control" id="userTelNo" name="userTelNo" th:value="${user.userTelNo}">-->
+                                                <input type="text" class="form-control" id="userTelNo" name="userTelNo" >
+                                            </div>
+
+                                            <!-- 핸드폰 번호 -->
+                                            <div class="mb-3">
+                                                <label for="userPhoneNo" class="form-label">핸드폰 번호</label>
+                                                <input type="text" class="form-control" id="userPhoneNo" name="userPhoneNo" >
+            <!--                                    <input type="text" class="form-control" id="userPhoneNo" name="userPhoneNo" th:value="${user.userPhoneNo}">-->
+                                            </div>
+
+                                            <!-- 이메일 -->
+                                            <div class="mb-3">
+                                                <label for="userEmail" class="form-label">이메일</label>
+                                                <input type="email" class="form-control" id="userEmail" name="userEmail" >
+            <!--                                    <input type="email" class="form-control" id="userEmail" name="userEmail" th:value="${user.userEmail}">-->
+                                            </div>
+
+                                            <!-- 생일 -->
+                                            <div class="mb-3">
+                                                <label for="birthDate" class="form-label">생일</label>
+                                                <input type="date" class="form-control" id="birthDate" name="birthDate">
+            <!--                                    <input type="date" class="form-control" id="birthDate" name="birthDate" th:value="${user.birthDate}">-->
+                                            </div>
+
+                                            <!-- 비고 -->
+                                            <div class="mb-3">
+                                                <label for="remark" class="form-label">비고</label>
+                                                <textarea class="form-control" id="remark" name="remark" ></textarea>
+            <!--                                    <textarea class="form-control" id="remark" name="remark" th:text="${user.remark}"></textarea>-->
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary waves-effect waves-themed" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary waves-effect waves-themed">Save changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 개인정보 설정 모달 끝 -->
+                        <!-- 비밀번호 변경 모달 -->
+                        <div class="modal fade show" id="passwordChangeModal" tabindex="-1" style="display: none; padding-right: 17px;" aria-modal="true" role="dialog">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">
+                                            비밀번호 변경
+                                            <small class="m-0 text-muted">
+                                                아래 항목들을 작성해주시기 바랍니다.
+                                            </small>
+                                        </h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="pwdChgForm" method="post">
+                                            <div class="form-group">
+                                                <label for="currentPassword">현재 비밀번호</label>
+                                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="newPassword">새 비밀번호</label>
+                                                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="confirmNewPassword">새 비밀번호 확인</label>
+                                                <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary waves-effect waves-themed" data-dismiss="modal">Close</button>
+                                        <button id="pwdChgBtn" type="button" class="btn btn-primary waves-effect waves-themed">변경하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 비밀번호 변경 모달 끝 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 화면 끝 -->
+
+        <!-- 스크립트 시작 -->
+        <script th:inline="javascript" type="module">
+            import FormService from '/common/js/FormService.js';
+            const pwdChgForm = new FormService('pwdChgForm');
+            const userInfoForm = new FormService('userInfoForm');
+
+            /** document ready */
+            document.addEventListener('DOMContentLoaded', function() {
+
+                getInitialSetting()
+                document.getElementById('pwdChgBtn').addEventListener('click', pwdChgProcess);
+                document.getElementById('deleteUser').addEventListener('click', deleteUserProcess);
+            });
+
+            //계정 삭제 프로세스
+            function deleteUserProcess(){
+                let result = confirm("정말로 계정을 삭제하시겠습니까?");
+                if ( result ) {
+                    //계정 잠금 프로세스 진행
+                }
+            }
+
+            //비밀번호 변경 프로세스
+            function pwdChgProcess() {
+                //유효성검사
+                pwdChgForm.onValidation();
+
+                //ajax로 비밀번호 변경 호출
+                let sendToData = pwdChgForm.getFormValues();
+            }
+
+            //초기 화면 세팅
+            function getInitialSetting(){
+                //나의 포인트 세팅
+
+                /*<![CDATA[*/ let envirScore = JSON.parse(/*[[${envirScore}]]*/ '{}');/*]]>*/
+                let takingScoreDiv = document.getElementById("takingScore");
+                let disposalScoreDiv = document.getElementById("disposalScore");
+                let attendScoreDiv = document.getElementById("attendScore");
+
+                const totalScore = envirScore.totalScore;
+                const takingScore = envirScore.takingAddScore + envirScore.takingEndScore;
+                const disposalScore = envirScore.disposalScore;
+                const attendScore = envirScore.attendScore;
+
+                //퍼센트 주기
+                takingScoreDiv.style.width = Math.round(takingScore/totalScore * 100) + '%';
+                disposalScoreDiv.style.width = Math.round(disposalScore/totalScore * 100)+ '%';
+                attendScoreDiv.style.width = Math.round(attendScore/totalScore * 100)+ '%';
+
+                takingScoreDiv.innerHTML = '복용 점수';
+                disposalScoreDiv.innerHTML = '배출 점수';
+                attendScoreDiv.innerHTML = '출석 점수';
+            }
+        </script>
+        <!-- 스크립트 끝 -->
+    </div>
+</html>

@@ -1,0 +1,61 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+    <div layout:fragment="content">
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12">
+                               <div class="panel">
+                                  <div class="panel-container show">
+                                     <div class="panel-content">
+                                        <table id="medication-search-result-table" class="table table-bordered table-hover table-striped w-100">
+                                        </table>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+
+            $(document).ready(function() {
+                var table = $('#medication-search-result-table').DataTable({
+                    responsive: true, // 반응형 테이블 설정
+                    paging: true, // 페이징 활성화
+                    searching: true, // 검색 필터 활성화
+                    ordering: true, // 정렬 기능 활성화
+                    info: true, // 정보 표시 활성화
+                    ajax: {
+                        url: '/taking/getDataTableData', // 데이터 요청 URL
+                        dataSrc: 'data' // 응답 데이터 경로
+                    },
+                    columns: [
+                        { data: 'key1', title: 'No' },
+                        { data: 'key2', title: '사진' },
+                        { data: 'key3', title: '제품명(한글/영어)' },
+                        { data: 'key4', title: '제조사(한글/영어)' },
+                        { data: 'key5', title: '품목' },
+                        { data: 'key6', title: '코드' },
+                        { data: 'key7', title: '분류' }
+                    ],
+                    columnDefs: [
+                        { targets: 3, visible: true }, // 특정 열 설정 예시
+                        { targets: 4, visible: true }  // 특정 열 설정 예시
+                    ],
+                    language: {
+                        lengthMenu: '_MENU_',
+                        zeroRecords: '조건에 맞는 의약품이 존재하지 않습니다.',
+                        info: '총 _PAGES_개 페이지 중 _PAGE_번째 페이지 조회',
+                        infoEmpty: '조회 가능한 데이터가 없습니다.',
+                        infoFiltered: '(filtered from _MAX_ total records)'
+                    }
+                });
+            });
+        
+        </script>
+    </div>
+</html>

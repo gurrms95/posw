@@ -1,0 +1,49 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+    <div layout:fragment="content">
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                                    약 검색하기
+                                    <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60 hidden-sm-down">
+                                        찾고싶은 약을 검색해주세요!
+                                    </small>
+                                </h2>
+                            </div>
+                            <div class="col-xl-6 ml-auto mr-auto">
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <form id="js-login" novalidate="" action="intel_analytics_dashboard.html">
+                                        <div class="form-group">
+                                            <label class="form-label">Please search for the medicine you want to find!</label>
+                                            <div class="input-group input-group-lg bg-white shadow-inset-2">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-transparent border-right-0 py-1 px-3 text-success">
+                                                        <i class="fal fa-search"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" class="form-control border-left-0 bg-transparent pl-0" placeholder="약 이름을 검색해보세요">
+                                                <div class="input-group-append">
+                                                    <button onclick="onSearch();" class="btn btn-primary" type="button">검색</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+
+            function onSearch() {
+                location.href = '/searching/list';
+            }
+
+        </script>
+    </div>
+</html>

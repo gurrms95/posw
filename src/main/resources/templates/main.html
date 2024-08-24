@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main_layout}">
+<div layout:fragment="content">
+    <div class="page-wrapper auth">
+        <div class="page-inner bg-brand-gradient">
+            <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                    <div class="row">
+                        <div class="text-left-bottom">
+                            <h1 class="text-style">
+                                조약돌
+                                <br>
+                                조그만한 약이 나에게 돌아온다
+                            </h1>
+                            <hr class="separator">
+                            <p>
+                                우리아이, 우리 건강 함께 지켜요
+                            </p>
+                        </div>
+                        <div class="ul-style">
+                            <ul class="card-list">
+                                <li class="card">
+                                    <h3><b>복용관리</b></h3>
+                                    <div class="popup-info">
+                                        <ul class="nav-menu">
+                                            <li>
+                                                <a href="/taking/search">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">복용약 검색</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/taking/registrationMain">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">복용 메인</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/taking/registrationForm">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">복용약 등록</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/taking/scheduleList">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_project_structure">복용 스케줄</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <img src="/img/medication.png" class="bottom-right-image">
+                                </li>
+                                <li class="card">
+                                    <h3><b>배출관리</b></h3>
+                                    <div class="popup-info">
+                                        <ul class="nav-menu">
+                                            <li>
+                                                <a href="/mbox/mboxDescrpt.do">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">폐의약품 배출방법</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/mbox/mbox.do">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">내 주변 폐의약품 수거함</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/mbox/mboxSearch.do">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">폐의약품 수거함 검색</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <img src="/images/recycle.svg" class="bottom-right-image">
+                                </li>
+                                <li class="card">
+                                    <h3><b>환경지킴이</b></h3>
+                                    <div class="popup-info">
+                                        <ul class="nav-menu">
+                                            <li>
+                                                <a href="/envir_score/getScore">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">나의 포인트</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/envir_score/getRank">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_project_structure">나의 활동분석</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/envir_score/getPoint">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_project_structure">포인트 쌓기</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <img src="/img/crownEarth.svg" class="bottom-right-image">
+                                </li>
+                                <li class="card">
+                                    <h3><b>커뮤니티</b></h3>
+                                    <div class="popup-info">
+                                        <ul class="nav-menu">
+                                            <li>
+                                                <a href="/osw/comView">
+                                                    <span class="nav-link-text" data-i18n="nav.documentation_general_docs">커뮤니티</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <img src="/img/community.png" class="bottom-right-image">
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import AlarmService from '/common/js/AlarmService.js';
+        const alarmService = new AlarmService();
+        const userId = `[[${userId}]]`;
+
+        $(document).ready(function(){
+
+
+            //팝업 쿠키 조회
+            let cookie = alarmService.getCookie('hidePopup');
+            if( !cookie ){
+                alarmService.hasAlarm(userId);
+            }
+        });
+    </script>
+</div>
+</html>

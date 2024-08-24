@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="UTF-8">
+        <title>공모전</title>
+        <meta name="_csrf" th:content="${_csrf.token}">
+        <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    
+        <!-- 레이아웃 CSS -->
+        <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="/css/vendors.bundle.css">
+        <link id="appbundle" rel="stylesheet" media="screen, print" href="/css/app.bundle.css">
+        <link id="myskin" rel="stylesheet" media="screen, print" href="/css/skins/skin-master.css">
+
+        <!-- 레이아웃 기본 테마를 Atlantis(cust-theme-2.css) 연두색으로 설정 -->
+        <link id="mytheme" rel="stylesheet" media="screen, print" href="/css/themes/cust-theme-2.css">
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+        <!-- 커스터마이징 CSS -->
+        <link rel="stylesheet" media="screen, print" href="/css/customize.css">
+        <link rel="stylesheet" media="screen, print" href="/css/customize_main.css">
+
+        <!-- 아이콘 CSS -->
+        <link rel="stylesheet" media="screen, print" href="/css/fa-brands.css">
+        <link rel="stylesheet" media="screen, print" href="/css/fa-solid.css">
+        <link rel="stylesheet" media="screen, print" href="/css/fa-duotone.css">
+
+        <link rel="stylesheet" media="screen, print" href="/css/miscellaneous/reactions/reactions.css">
+        <link rel="stylesheet" media="screen, print" href="/css/miscellaneous/jqvmap/jqvmap.bundle.css">
+    
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+        <th:block layout="script"></th:block>
+        <th:block layout="css"></th:block>
+
+        <!-- CHART-->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+        <!-- RxJs -->
+        <script src="https://unpkg.com/@reactivex/rxjs/dist/global/rxjs.umd.js"></script>
+  
+    </head>
+    <body class="mod-skin-light mod-bg-1 nav-function-top footer-function-fixed">
+        <div class="page-wrapper">
+            <div class="page-inner">
+                <!-- 메뉴 -->
+               <aside th:replace="~{fragments/user/navigation::navigation}"></aside>
+                <div class="page-content-wrapper">
+                    <!-- 헤더 -->
+                    <header th:replace="~{fragments/user/header::header}"></header>
+                    <main id="js-page-content" class="page-content" role="main">
+                        <!-- 메인 배너 -->
+                        <!--<div th:replace="~{fragments/user/main_banner :: main_banner}"></div>-->
+                        <!-- 일반 콘텐츠 -->
+                        <section>
+                            <div layout:fragment="content"></div>
+                            <div th:replace="~{fragments/user/center_modal :: center_modal}"></div>
+                        </section>
+                    </main>
+                    <!-- 푸터 -->
+                    <footer th:replace="~{fragments/user/footer::footer}"></footer>
+                    <!-- 상단 히든 모달 -->
+                    <div th:replace="~{fragments/user/hidden_top_modal :: hidden_top_modal}"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 우측 히든 모달 -->
+        <div th:replace="~{fragments/user/hidden_right_modal :: hidden_right_modal}"></div>
+        <!-- 컬러 프로필 (hidden, CSS 색상 참조용으로만 사용) -->
+        <p id="js-color-profile" class="d-none">
+            <span class="color-primary-50"></span>
+            <span class="color-primary-100"></span>
+            <span class="color-primary-200"></span>
+            <span class="color-primary-300"></span>
+            <span class="color-primary-400"></span>
+            <span class="color-primary-500"></span>
+            <span class="color-primary-600"></span>
+            <span class="color-primary-700"></span>
+            <span class="color-primary-800"></span>
+            <span class="color-primary-900"></span>
+            <span class="color-info-50"></span>
+            <span class="color-info-100"></span>
+            <span class="color-info-200"></span>
+            <span class="color-info-300"></span>
+            <span class="color-info-400"></span>
+            <span class="color-info-500"></span>
+            <span class="color-info-600"></span>
+            <span class="color-info-700"></span>
+            <span class="color-info-800"></span>
+            <span class="color-info-900"></span>
+            <span class="color-danger-50"></span>
+            <span class="color-danger-100"></span>
+            <span class="color-danger-200"></span>
+            <span class="color-danger-300"></span>
+            <span class="color-danger-400"></span>
+            <span class="color-danger-500"></span>
+            <span class="color-danger-600"></span>
+            <span class="color-danger-700"></span>
+            <span class="color-danger-800"></span>
+            <span class="color-danger-900"></span>
+            <span class="color-warning-50"></span>
+            <span class="color-warning-100"></span>
+            <span class="color-warning-200"></span>
+            <span class="color-warning-300"></span>
+            <span class="color-warning-400"></span>
+            <span class="color-warning-500"></span>
+            <span class="color-warning-600"></span>
+            <span class="color-warning-700"></span>
+            <span class="color-warning-800"></span>
+            <span class="color-warning-900"></span>
+            <span class="color-success-50"></span>
+            <span class="color-success-100"></span>
+            <span class="color-success-200"></span>
+            <span class="color-success-300"></span>
+            <span class="color-success-400"></span>
+            <span class="color-success-500"></span>
+            <span class="color-success-600"></span>
+            <span class="color-success-700"></span>
+            <span class="color-success-800"></span>
+            <span class="color-success-900"></span>
+            <span class="color-fusion-50"></span>
+            <span class="color-fusion-100"></span>
+            <span class="color-fusion-200"></span>
+            <span class="color-fusion-300"></span>
+            <span class="color-fusion-400"></span>
+            <span class="color-fusion-500"></span>
+            <span class="color-fusion-600"></span>
+            <span class="color-fusion-700"></span>
+            <span class="color-fusion-800"></span>
+            <span class="color-fusion-900"></span>
+        </p>
+        <!-- 템플릿 스크립트 -->
+        <script src="/js/vendors.bundle.js"></script>
+        <script src="/js/app.bundle.js"></script>
+        <script src="/js/datagrid/datatables/datatables.bundle.js"></script>
+    </body>
+</html>

@@ -1,0 +1,141 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+  <div layout:fragment="content">
+    <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${MAPKEY} + '&libraries=services,clusterer,drawing'"></script>
+    <div class="page-wrapper auth">
+      <div class="page-inner bg-brand-gradient">
+        <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+          <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+            <div class="row">
+              <div class="col-xl-6 order-xl-1">
+                <div class="card mb-g">
+                  <div class="card-body pb-0 px-4" style="height: 750px">
+                    <h2><b>내주변 폐의약품 수거함 위치(200M이내)</b></h2>
+                    <div class="d-flex overflow-hidden rounded w-100 border">
+                      <div class="row no-gutters">
+                        <div class="col">
+                          <div class="bg-faded flex-1 h-50">
+                            <div id="map" style="width:836px;height:680px;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-6 order-xl-2">
+                <div class="card mb-g">
+                  <div class="card-body pb-0 px-4" style="height: 750px">
+                    <h2><b>내주변 폐의약품 수거함 위치 목록</b></h2>
+                    <div class="d-flex overflow-hidden rounded w-100 border" style="height: 680px; overflow: auto !important;">
+                      <div class="row no-gutters">
+                        <div class="col">
+                          <div class="flex-1 p-4 h-100">
+                            <div id="ajaxTestLayoutByDataTable" class="panel-content">
+                              <div id="dt-basic-example_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                <div class="row">
+                                  <div id="mboxListDataTable" class="col-sm-12">
+                                    <table id="mboxListTable" class="table table-bordered table-hover table-striped w-100">
+                                      <thead>
+                                        <tr>
+                                          <th>순번</th>
+                                          <th>수거함 명칭</th>
+                                          <th>도로명주소</th>
+                                          <th>지번주소</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody></tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      let mboxList = /*[[${WMCB}]]*/'{}';
+      let mboxData = JSON.parse(mboxList);
+      /*]]>*/
+    </script>
+    <script type="module">
+      import KakaoMapService from '/common/js/KakaoMapService.js';
+
+      let container = document.querySelectorAll("#map");
+
+      let kakaMap = new KakaoMapService();
+
+      //내위치 좌표찾기
+      //let myLoc =  await  kakaMap.getMyLocation();
+      let myLoc = {
+        lat:36.4854059,
+        lon:127.3016856
+      }
+
+      //좌표->주소로 변환
+      let myAddress =  await kakaMap.getCoordSearch(myLoc);
+
+      //카카오맵 실행
+      let map =  kakaMap.setKakaoMap(container,myLoc);
+
+      let jsonMbox = JSON.parse(mboxData.body);
+
+      // 소담동 -> myAddress.road_address.road_name
+      //       -> myAddress.address.region_3depth_name
+      let fiterMbox = Object.keys(jsonMbox).reduce((result,key)=>{
+        let value = jsonMbox[key];
+
+        if(typeof  value === 'object' && value !== null){
+          for (const prop in value) {
+            if (String(value[prop]).includes(myAddress.address.region_3depth_name)) {
+              result[key] = value;
+              break;
+            }
+          }
+        } else if(String(value).includes(myAddress.address.region_3depth_name)) {
+          result[key] = value;
+        }
+        return result;
+      }, {});
+
+      let addList = [];
+
+      Object.values(fiterMbox).forEach(function (box){
+        addList.push({"name":box['수거함 명칭'],"dAddress":box['도로명주소'],"gAddress":box['지번주소']});
+      })
+
+      //주소->좌표로 변환
+      let addToCoor = await kakaMap.getAddressSearch(addList);
+
+      //내주변 --M안에 있는 좌표찾기
+      let radius = 200;
+      let nearbyCoordinates = kakaMap.filterCoordinatesWithinRadius(myLoc,addToCoor,radius);
+
+      //카카오맵에 마커넣기
+      kakaMap.setMarker(map,nearbyCoordinates);
+
+      //내주변 --M안 반경표시
+      kakaMap.setDrawCircle(map,myLoc,radius);
+
+      $(document).ready(function() {
+        nearbyCoordinates.forEach(function (item,index){
+          let row = $("<tr></tr>");
+          row.append($("<td></td>").text(index+1));
+          row.append($("<td></td>").text(item.name));
+          row.append($("<td></td>").text(item.dposition));
+          row.append($("<td></td>").text(item.gposition));
+          $("#mboxListTable tbody").append(row);
+        });
+      });
+    </script>
+  </div>
+</html>

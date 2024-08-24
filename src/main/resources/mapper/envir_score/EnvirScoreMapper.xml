@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.omid.osw.web.envirScore.mapper.EnvirScoreMapper">
+
+    <insert id="addUser" parameterType="EnvirScoreDTO">
+        INSERT INTO envir_score (
+                USER_ID
+                , USE_YN
+                , INP_DT
+                , TAKING_ADD_SCORE
+                , TAKING_END_SCORE
+                , DISPOSAL_SCORE
+                , ETC_SCORE
+            ) VALUES (
+               #{userId}
+               , 'Y'
+               , CURRENT_DATE
+               , 0
+               , 0
+               , 0
+               , 0
+            )
+    </insert>
+
+    <update id="removeUser" parameterType="String">
+        UPDATE
+            envir_score
+        SET
+            USE_YN = 'N'
+        WHERE
+            USER_ID = #{userId}
+    </update>
+
+    <insert id="saveEnvirScore" parameterType="EnvirScoreDTO">
+        INSERT INTO envir_score (
+                 USER_ID
+                , USE_YN
+                , INP_DT
+                , TAKING_ADD_SCORE
+                , TAKING_END_SCORE
+                , DISPOSAL_SCORE
+                , ETC_SCORE
+            ) VALUES (
+                #{userId}
+                 , 'Y'
+                 , CURRENT_DATE
+                 , #{takingAddScore}
+                 , #{takingEndScore}
+                 , #{disposalScore}
+                 , #{etcScore}
+             )
+    </insert>
+
+    <select id="getUserScore" parameterType="String" resultType="EnvirScoreDTO">
+        SELECT
+            USER_ID,
+            YEAR(INP_DT) AS `YEAR`,
+            SUM(TAKING_ADD_SCORE) AS `TAKING_ADD_SCORE`,
+            SUM(TAKING_END_SCORE) AS `TAKING_END_SCORE`,
+            SUM(DISPOSAL_SCORE) AS `DISPOSAL_SCORE`,
+            SUM(ETC_SCORE) AS `ETC_SCORE`,
+            (SUM(TAKING_ADD_SCORE) +
+            SUM(TAKING_END_SCORE) +
+            SUM(DISPOSAL_SCORE) +
+            SUM(ETC_SCORE)) AS `TOTAL_SCORE`
+        FROM
+            envir_score
+        WHERE
+            USER_ID = #{userId}
+          AND YEAR(INP_DT) = YEAR(CURDATE())
+        GROUP BY
+            USER_ID, YEAR(INP_DT)
+    </select>
+
+    <select id="getUserRank" parameterType="String" resultType="EnvirScoreDTO">
+        -- 전체 사용자 점수 합계를 계산하는 CTE (Common Table Expression)
+        WITH user_scores AS (
+            SELECT
+                USER_ID,
+                SUM(TAKING_ADD_SCORE) AS TOTAL_TAKING_ADD_SCORE,
+                SUM(TAKING_END_SCORE) AS TOTAL_TAKING_END_SCORE,
+                SUM(DISPOSAL_SCORE) AS TOTAL_DISPOSAL_SCORE,
+                SUM(ETC_SCORE) AS TOTAL_ETC_SCORE,
+                (SUM(TAKING_ADD_SCORE) +
+                 SUM(TAKING_END_SCORE) +
+                 SUM(DISPOSAL_SCORE) +
+                 SUM(ETC_SCORE)) AS TOTAL_SCORE,
+                (SUM(TAKING_ADD_SCORE) + SUM(TAKING_END_SCORE)) AS TOTAL_TAKING_SCORE
+            FROM
+                envir_score
+            WHERE
+            YEAR(INP_DT) = YEAR(CURDATE())
+        GROUP BY
+            USER_ID
+        ),
+
+        -- 특정 사용자의 점수 합계와 등수를 계산하는 CTE
+        ranked_scores AS (
+            SELECT
+                USER_ID,
+                TOTAL_TAKING_ADD_SCORE,
+                TOTAL_TAKING_END_SCORE,
+                TOTAL_DISPOSAL_SCORE,
+                TOTAL_ETC_SCORE,
+                TOTAL_SCORE,
+                TOTAL_TAKING_SCORE,
+                RANK() OVER (ORDER BY TOTAL_SCORE DESC) AS TOTAL_SCORE_RANK,
+                ROUND(PERCENT_RANK() OVER (ORDER BY TOTAL_SCORE DESC) * 100) AS TOTAL_SCORE_PERCENT,
+                RANK() OVER (ORDER BY TOTAL_TAKING_ADD_SCORE DESC) AS TAKING_ADD_SCORE_RANK,
+                RANK() OVER (ORDER BY TOTAL_TAKING_END_SCORE DESC) AS TAKING_END_SCORE_RANK,
+                RANK() OVER (ORDER BY TOTAL_DISPOSAL_SCORE DESC) AS DISPOSAL_SCORE_RANK,
+                RANK() OVER (ORDER BY TOTAL_ETC_SCORE DESC) AS ETC_SCORE_RANK,
+                RANK() OVER (ORDER BY TOTAL_TAKING_SCORE DESC) AS TAKING_SCORE_RANK
+            FROM
+                user_scores
+        )
+
+        -- 최종 결과를 특정 사용자에 대해서만 필터링하여 출력
+        SELECT
+            USER_ID,
+            TOTAL_SCORE,
+            TOTAL_SCORE_RANK,
+            TOTAL_SCORE_PERCENT,
+            TAKING_ADD_SCORE_RANK,
+            TAKING_END_SCORE_RANK,
+            DISPOSAL_SCORE_RANK,
+            ETC_SCORE_RANK,
+            TAKING_SCORE_RANK
+        FROM
+            ranked_scores
+        WHERE
+            USER_ID = #{userId}
+    </select>
+
+    <select id="getAvgScoreRank" resultType="EnvirScoreDTO">
+        SELECT
+            ROUND(AVG(TAKING_ADD_SCORE)) AS avgTakingAddScore,
+            ROUND(AVG(TAKING_END_SCORE)) AS avgTakingEndScore,
+            ROUND(AVG(DISPOSAL_SCORE)) AS avgDisposalScore,
+            ROUND(AVG(ETC_SCORE)) AS avgEtcScore
+        FROM
+            envir_score
+        WHERE
+            YEAR(INP_DT) = YEAR(CURDATE())
+    </select>
+
+
+</mapper>

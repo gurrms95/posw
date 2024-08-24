@@ -1,0 +1,55 @@
+<div th:fragment="center_modal">
+    <!--복용중인 약 - 등록 모달 -->
+    <div class="modal fade" id="medication-hand-regist" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">복용중인 약 등록하기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="panel-content">
+                        <div class="panel-tag">
+                            약 봉투 사진을 찍거나 직접 약을 검색하고 추가할 수 있습니다
+                        </div>
+                        <div class="card-deck">
+                            <div class="card regist-card" style="background-color: #fff5ed">
+                                <div class="card-body">
+                                    <h5 class="card-title">사진으로 등록하기</h5>
+                                    <p class="card-text">
+                                        Register as a photo    
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">준비중</small>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div onclick="onRegistSelfForm();" class="card-body regist-card">
+                                    <h5 class="card-title">직접 등록하기</h5>
+                                    <p class="card-text">
+                                        Register yourself
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">약품을 검색하여 등록합니다.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소하기</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            // 복용중인 약 - 직접 등록 폼 화면으로 이동
+            function onRegistSelfForm() {
+                location.href = '/taking/registrationForm';
+            }
+        </script>
+    </div>
+</div>

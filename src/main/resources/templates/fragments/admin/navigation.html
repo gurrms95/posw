@@ -1,0 +1,138 @@
+<aside class="page-sidebar" th:fragment="navigation">
+    <div class="page-logo">
+        <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+            <!-- <img src="/img/logo.png" alt="SmartAdmin WebApp" aria-roledescription="logo"> -->
+            <span class="page-logo-text mr-1">
+                시스템관리
+            </span>
+            <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
+            <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
+        </a>
+    </div>
+    <!-- BEGIN PRIMARY NAVIGATION -->
+    <nav id="js-primary-nav" class="primary-nav" role="navigation">
+        <div class="nav-filter">
+            <div class="position-relative">
+                <input type="text" id="nav_filter_input" placeholder="메뉴명을 입력하세요" class="form-control" tabindex="0">
+                <a href="#" onclick="return false;" class="btn-primary btn-search-close js-waves-off" data-action="toggle" data-class="list-filter-active" data-target=".page-sidebar">
+                    <i class="fal fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="info-card">
+            <img src="/img/demo/avatars/avatar-m.png" class="profile-image rounded-circle" alt="user-image">
+            <div class="info-card-text">
+                <a href="#" class="d-flex align-items-center text-white">
+                    <span th:text="${#authentication.getPrincipal() instanceof T(org.springframework.security.core.userdetails.UserDetails) ? #authentication.getPrincipal().getOswUser().getUserKornNam() : ''}"s
+                          class="text-truncate text-truncate-sm d-inline-block">
+                    </span>
+                </a>
+                <span th:text="${#authentication.getPrincipal() instanceof T(org.springframework.security.core.userdetails.UserDetails) ? #authentication.getPrincipal().getOswUser().getRemark() : ''}"
+                      class="d-inline-block text-truncate text-truncate-sm">
+                </span>
+            </div>
+            <!-- <img src="/img/card-backgrounds/cover-2-lg.png" class="cover" alt="cover"> -->
+            <a href="#" onclick="return false;" class="pull-trigger-btn" data-action="toggle" data-class="list-filter-active" data-target=".page-sidebar" data-focus="nav_filter_input">
+                <i class="fal fa-angle-down"></i>
+            </a>
+        </div>
+        <ul id="js-nav-menu" class="nav-menu">
+            <li class="nav-title">시스템관리</li>
+            <!-- <li>
+                <a href="/system/user/manage" title="HOME" data-filter-tags="HOME">
+                    <i class="fal fa-home-alt"></i>
+                    <span class="nav-link-text">HOME</span>
+                </a>
+            </li> -->
+            <li>
+                <a href="/system/user/manage" title="사용자 관리" data-filter-tags="사용자 관리">
+                    <i class="fal fa-arrow-right"></i>
+                    <span class="nav-link-text">사용자 관리</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" title="권한 관리" data-filter-tags="권한 관리">
+                    <i class="fal fa-arrow-right"></i>
+                    <span class="nav-link-text">권한 관리</span>
+                </a>
+                <ul>
+                    <li>
+                        <a href="/system/role/manage" title="역할 관리" data-filter-tags="역할 관리">
+                            <span class="nav-link-text">역할 관리</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/system/role/user/manage" title="사용자 역할 매핑" data-filter-tags="사용자 역할 매핑">
+                            <span class="nav-link-text">사용자 역할 매핑</span>
+                        </a>
+                    </li>
+                    <!-- <li>
+                        <a href="/system/role/menu/manage" title="메뉴 역할 관리" data-filter-tags="메뉴 역할 관리">
+                            <span class="nav-link-text">메뉴 역할 관리</span>
+                            <span class="dl-ref bg-primary-500 hidden-nav-function-minify hidden-nav-function-top">개발중</span>
+                        </a>
+                    </li> -->
+                </ul>
+            </li>
+            <!-- <li>
+                <a href="/system/code/manage" title="공통코드 관리" data-filter-tags="공통코드 관리">
+                    <i class="fal fa-arrow-right"></i>
+                    <span class="nav-link-text">공통코드 관리</span>
+                </a>
+            </li> -->
+            <li class="nav-title">사용자 서비스</li>
+            <li>
+                <a href="/" title="메인으로 가기" data-filter-tags="메인으로 가기">
+                    <i class="fal fa-home-alt"></i>
+                    <span class="nav-link-text">메인으로 가기</span>
+                </a>
+            </li>
+            <!-- <li class="nav-title">UI LIBRARY</li>
+            <li>
+                <a onclick="clearStorageAndRedirect(event)" href="https://www.gotbootstrap.com/themes/smartadmin/4.6.0/intel_marketing_dashboard.html" title="템플릿" data-filter-tags="템플릿">
+                    <i class="fal fa-arrow-right"></i>
+                    <span class="nav-link-text">템플릿</span>
+                    <span class="dl-ref bg-primary-500 hidden-nav-function-minify hidden-nav-function-top">개발 시 참조</span>
+                </a>
+            </li> -->
+        </ul>
+        <div class="filter-message js-filter-message bg-success-600"></div>
+    </nav>
+    <!-- END PRIMARY NAVIGATION -->
+    <!-- NAV FOOTER -->
+    <div class="nav-footer shadow-top">
+        <a href="#" onclick="return false;" data-action="toggle" data-class="nav-function-minify" class="hidden-md-down">
+            <i class="ni ni-chevron-right"></i>
+            <i class="ni ni-chevron-right"></i>
+        </a>
+        <ul class="list-table m-auto nav-footer-buttons">
+            <li>
+                <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="Chat logs">
+                    <i class="fal fa-comments"></i>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="Support Chat">
+                    <i class="fal fa-life-ring"></i>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="Make a call">
+                    <i class="fal fa-phone"></i>
+                </a>
+            </li>
+        </ul>
+        <script>
+            function clearStorageAndRedirect(url) {
+                event.preventDefault();
+            
+                // 템플릿 사이트로 이동하기 전에 현재 세팅되어있는 localStorage를 초기화 - 현재 그룹웨어에서 커스터마이징한 레이아웃 상태를 가져가지 않기 위함
+                localStorage.clear();
+            
+                // 새 탭에서 템플릿 사이트 오픈
+                window.open(event.currentTarget.href, '_blank');
+            }
+        </script>
+    </div>
+</aside>
+    

@@ -1,0 +1,64 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/admin_layout}">
+    <div layout:fragment="content">
+        <div class="row">
+            <div class="col-md-12 col-xl-12">
+               <div id="panel-1" class="panel">
+                  <div class="panel-hdr">
+                        <h2>
+                           사용자 목록
+                        </h2>
+                  </div>
+                  <div class="panel-container show">
+                     <div id="user-list-container" class="panel-content">
+                        <table id="user-list" class="table table-bordered table-hover table-striped w-100">
+                       </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <script type="module">
+
+            import DataTableService from '/common/js/DataTableService.js';
+            
+            $(document).ready(function() {
+
+                const roleTable = new DataTableService('#user-list', null, {
+                    responsive: true,
+                    paging: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    editMode: false, // 편집 기능 활성화
+                    ajax: {
+                        url: '/system/user/list',
+                        dataSrc: 'userList'
+                    },
+                    columns: [
+                        { data: 'no', title: '순번' },
+                        { data: 'userSecCd', title: '사용자유형코드' },
+                        { data: 'userId', title: '사용자ID' },
+                        { data: 'userKornNam', title: '한글성명' },
+                        { data: 'genderSecNae', title: '성별' },
+                        { data: 'brthDe', title: '생일' },
+                        { data: 'useYn', title: '사용여부' },
+                        { data: 'remark', title: '비고' },
+                        { data: 'lasLoginDt', title: '최종로그인일시' },
+                        { data: 'inpDt', title: '등록일시' }
+                    ],
+                    language: {
+                        lengthMenu: '_MENU_',
+                        zeroRecords: '조건에 맞는 사용자가 존재하지 않습니다.',
+                        info: '총 _PAGES_개 페이지 중 _PAGE_번째 페이지 조회',
+                        infoEmpty: '조회 가능한 데이터가 없습니다.',
+                        infoFiltered: '(filtered from _MAX_ total records)'
+                    },
+                    initComplete: function() {
+                        
+                    }
+                });
+            });
+
+        </script>
+    </div>
+</html>

@@ -1,0 +1,87 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/main_layout}">
+    <div layout:fragment="content">
+        <div class="page-wrapper">
+            <div class="page-inner">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col col-md-6 col-lg-7 hidden-sm-down">
+                                <h1 class="text-style">
+                                    조약돌,
+                                    <br/>
+                                    조그만한 약이 나에게 돌아온다
+                                </h1>
+                                <br/>
+                                <!-- <hr class="separator"> -->
+                                <p>
+                                    우리아이, 우리 건강 함께 지켜요
+                                </p>
+                                <!-- <a href="#" class="fs-lg fw-500 opacity-70">Learn more &gt;&gt;</a>
+                                <div class="d-sm-flex flex-column align-items-center justify-content-center d-md-block">
+                                    <div class="px-0 py-1 mt-5 fs-nano opacity-50">
+                                        Find us on social media
+                                    </div>
+                                    <div class="d-flex flex-row opacity-70">
+                                        <a href="#" class="mr-2 fs-xxl">
+                                            <i class="fab fa-facebook-square"></i>
+                                        </a>
+                                        <a href="#" class="mr-2 fs-xxl">
+                                            <i class="fab fa-twitter-square"></i>
+                                        </a>
+                                        <a href="#" class="mr-2 fs-xxl">
+                                            <i class="fab fa-google-plus-square"></i>
+                                        </a>
+                                        <a href="#" class="mr-2 fs-xxl">
+                                            <i class="fab fa-linkedin"></i>
+                                        </a>
+                                    </div>
+                                </div> -->
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-5 col-xl-4 ml-auto">
+                                <h1 class="text-white fw-300 mb-3 d-sm-block d-md-none">
+                                    Secure login
+                                </h1>
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <form action="/auth/login" method="post">
+                                        <div class="form-group">
+                                            <label class="form-label" for="userId">ID</label>
+                                            <input type="text" class="form-control form-control-lg" placeholder="ID" id="userId" name="userId">
+                                            <div class="help-block">Your unique e-mail to app</div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="userPassword">Password</label>
+                                            <input type="password" class="form-control form-control-lg" placeholder="password" id="userPassword" name="userPassword" autocomplete="password">
+                                            <div class="help-block">Your password</div>
+                                        </div>
+                                        <div class="form-group text-left">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="rememberme">
+                                                <label class="custom-control-label" for="rememberme">로그인 정보 기억하기</label>
+                                            </div>
+                                        </div>
+                                        <div class="row no-gutters">
+                                            <div class="col-lg-8 pr-lg-1 my-2">
+                                                <!-- <button id="kakaoLogin" type="button" class="btn-lg"></button> -->
+                                                <a class="btn btn-lg !tw-block" id="startByKakao" href="https://kauth.kakao.com/oauth/authorize?response_type=code&amp;redirect_uri=http%3A%2F%2Flocalhost:80&amp;client_id=1e5a3dc3e82c2e2f3cab3e99919ed276&amp;state=Lw%253D%253D%7Ckakao_sync%7CY%7C%7C">
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;카카오로 시작하기
+                                                </a>
+                                            </div>
+                                            <div class="col-lg-4 pl-lg-1 my-2">
+                                                <button type="submit" class="btn btn-primary btn-block btn-lg">로그인</button>
+                                                <!-- <a href="/auth/forgetPage" class="btn btn-primary btn-block btn-lg">비밀번호 찾기</a> -->
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center">
+                            2024 © SmartAdmin by&nbsp;<a href='https://www.gotbootstrap.com' class='text-white opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>gotbootstrap.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>

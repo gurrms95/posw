@@ -1,0 +1,112 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+<head>
+    <title>제품 정보</title>
+    <style>
+        table.table th{
+            min-width: 85px;
+            font-size: 14px;
+            vertical-align: middle; /* 수직 정렬 */
+            align-items: center;
+            text-align: center;
+            background-color: #f1f1f1;
+        }
+        .center{
+            vertical-align: middle !important; /* 수직 정렬 */
+            align-items: center;
+            text-align: center;
+        }
+        .image-container {
+            text-align: center;
+        }
+        .image-container img {
+            max-width: 100%; /* 이미지를 반응형으로 설정 */
+            height: auto; /* 이미지를 반응형으로 설정 */
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                <div class="row">
+                    <div class="col-xl-6 ml-auto mr-auto">
+                        <div class="card p-4 rounded-plus bg-faded">
+                            <div class="frame-wrap p-0 border-0 m-0">
+                                <div th:if="${dataArr != null or dataArr.size() > 0}">
+                                    <div th:each="data : ${dataArr}">
+                                        <h1 class="subheader-title" style="margin-top: 10px">
+                                            <i class="fal fa-capsules fa-1x" style="margin: 10px 10px; font-weight: bolder" th:text="${searchItemName}"></i>
+                                            <small style="margin: 5px 5px">제품 정보</small>
+                                        </h1>
+                                        <table class="table m-0 table-bordered" id="table-example">
+                                            <tr>
+                                                <th>업체명</th>
+                                                <td th:text="${data.entpName} ?: '-'" class="center"></td>
+                                                <th>제품명</th>
+                                                <td th:text="${data.itemName}" class="center"></td>
+                                                <th>품목기준코드</th>
+                                                <td th:text="${data.itemSeq} ?: '-'" class="center"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>효능</th>
+                                                <td colspan="5" th:text="${data.efcyQesitm} ?: '-'" th:classappend="${data.efcyQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>사용법</th>
+                                                <td colspan="5" th:text="${data.useMethodQesitm} ?: '-'" th:classappend="${data.useMethodQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>사용전<br/>숙지사항</th>
+                                                <td colspan="5" th:text="${data.atpnWarnQesitm} ?: '-'" th:classappend="${data.atpnWarnQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>주의사항</th>
+                                                <td colspan="5" th:text="${data.atpnQesitm} ?: '-'" th:classappend="${data.atpnQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>상호작용</th>
+                                                <td colspan="5" th:text="${data.intrcQesitm} ?: '-'" th:classappend="${data.intrcQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>부작용</th>
+                                                <td colspan="5" th:text="${data.seQesitm} ?: '-'" th:classappend="${data.seQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>보관법</th>
+                                                <td colspan="5" th:text="${data.depositMethodQesitm} ?: '-'" th:classappend="${data.depositMethodQesitm} == null ? 'center' : ''"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>이미지</th>
+                                                <td colspan="5" class="image-container">
+                                                    <div th:if="${data.itemImage != null}">
+                                                        <img th:src="${data.itemImage}" alt="item image">
+                                                    </div>
+                                                    <div th:if="${data.itemImage == null}">
+                                                        <img th:src="@{/images/no-image.jpeg}" alt="no image available">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div th:if="${dataArr == null or dataArr.size() == 0}">
+                                    <div class="card-body">
+                                        <blockquote class="blockquote mb-0">
+                                            <p>약품에 대한 상세정보가 없습니다.</p>
+                                            <footer class="blockquote-footer">식품의약품안전처 의약품개요정보</footer>
+                                        </blockquote>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

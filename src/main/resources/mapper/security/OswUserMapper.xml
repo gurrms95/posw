@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.omid.osw.common.security.mapper.OswUserMapper">
+
+    <!-- 시스템 사용자 ID로 조회 -->
+    <select id="getOswUserById" resultType="OswUser" parameterType="String">
+        /* OswUserMapper.getOswUserById */
+        SELECT
+              ROW_NUMBER() OVER (ORDER BY INP_DT) AS NO -- 순번 (등록일시순)
+            , A.USER_SEN -- 사용자일련번호
+            , A.USER_ID -- 사용자계정아이디
+            , A.USER_PASSWORD -- 사용자계정비밀번호
+            , A.USE_YN -- 사용자계정비밀번호
+            , A.LOGIN_LOCK_YN -- 사용자계정비밀번호
+            , A.USER_SEC_CD -- 사용자계정비밀번호
+            , A.REMARK -- 비고
+            , B.JOIN_DE -- 가입일자
+            , B.OUT_DE -- 탈퇴일자
+            , B.OUT_REMARK -- 탈퇴사유비고
+            , B.USER_PHOTO -- 프로필사진
+            , B.USER_KORN_NAM -- 한글성명
+            , B.USER_ENG_NAM -- 영문성명
+            , B.USER_TEL_NO -- 전화번호
+            , B.USER_PHONE_NO -- 핸드폰번호
+            , B.USER_EMAIL -- 이메일
+            , B.GENDER_SEC_NAE -- 성별구분명
+            , B.BRTH_DE -- 생일
+            , B.REMARK AS INFO_REMARK -- 내부사용자정보 비고
+            , B.LAS_LOGIN_DT -- 마지막로그일일자
+            , B.LAS_LOGIN_IP -- 마지막로그인아이피
+            , A.INP_DT -- 등록일시
+            , A.INP_ID -- 등록ID
+            , A.UPD_DT -- 수정일시
+            , A.UPD_ID -- 수정ID
+            , A.USER_ROLE
+        FROM
+            CMMN_USER A
+        LEFT JOIN
+            CMMN_IN_USER_INFO B
+            ON A.USER_SEN = B.USER_SEN
+        WHERE A.USER_ID = #{userId}
+        ORDER BY A.USER_SEN
+    </select>
+
+    <!-- 시스템 사용자 역할(ROLE) 조회 -->
+    <select id="getAuthoritiesById" resultType="string" parameterType="string">
+        /* UserMapper.getAuthoritiesById */
+        SELECT
+            ROLE_ID
+	    FROM CMMN_ROLE_USER_MAPNG
+	    WHERE 1=1
+	        AND USER_ID = #{userId}
+    </select>
+
+    <!-- 사용자 로그아웃 시간 기록 -->
+    <update id="saveLasLoginDt" parameterType="String">
+        UPDATE CMMN_IN_USER_INFO
+           SET LAS_LOGIN_DT = SYSDATE()
+         WHERE 1=1
+           AND USER_ID = #{userId}
+    </update>
+
+</mapper>

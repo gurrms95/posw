@@ -1,0 +1,272 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/admin_layout}">
+<div layout:fragment="content">
+   <div class="row">
+      <div class="col-md-12 col-xl-6">
+         <div id="panel-1" class="panel">
+            <div class="panel-hdr">
+                  <h2>
+                     데이터테이블1 <span class="fw-300"><i>Ajax Test</i></span>
+                  </h2>
+            </div>
+            <div class="panel-container show">
+               <div id="ajaxTestLayoutByDataTable" class="panel-content">
+                  
+               </div>
+            </div>
+         </div>
+         <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                  <h2>
+                     캘린더(기본 옵션) <span class="fw-300"><i>Calender Test</i></span>
+                  </h2>
+            </div>
+            <div class="panel-container show">
+               <div id="calendarTestLayout" class="panel-content">
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-md-12 col-xl-6">
+         <div id="panel-4" class="panel">
+            <div class="panel-hdr">
+                  <h2>
+                     데이터테이블2 <span class="fw-300"><i>Ajax Test</i></span>
+                  </h2>
+            </div>
+            <div class="panel-container show">
+               <div id="ajaxTestLayoutByDataTable2" class="panel-content">
+
+               </div>
+            </div>
+         </div>
+         <div id="panel-5" class="panel">
+            <div class="panel-hdr">
+                  <h2>
+                     캘린더(복합 옵션) <span class="fw-300"><i>Calender Test</i></span>
+                  </h2>
+            </div>
+            <div class="panel-container show">
+               <div id="calendarTestLayout2" class="panel-content">
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script type="module">
+      
+      import AjaxService from '/common/js/AjaxService.js';
+      import CalendarService from '/common/js/CalendarService.js';
+      import MessageService from '/common/js/MessageService.js';
+  
+      const ajaxService = new AjaxService();
+      const calendarService = new CalendarService();
+      const messageService = new MessageService();
+  
+      const calendarOptions = {
+          initialView: 'dayGridMonth',
+          events: [
+              {
+                  title: 'Event 1',
+                  start: '2024-07-10'
+              },
+              {
+                  title: 'Event 2',
+                  start: '2024-07-15'
+              }
+          ]
+      };
+  
+      $(document).ready(function() {
+
+         ajaxService.request('/ajaxTest/getDataTable', 'GET')
+              .then(response => response.text())
+              .then(html => {
+                  $('#ajaxTestLayoutByDataTable').html(html);
+              })
+              .catch(error => {
+                  console.error(error.textStatus);
+              });
+  
+         ajaxService.request('/ajaxTest/getDataTable2', 'GET')
+              .then(response => response.text())
+              .then(html => {
+                  $('#ajaxTestLayoutByDataTable2').html(html);
+              })
+              .catch(error => {
+                  console.error(error.textStatus);
+              });
+
+         // 기본 옵션 캘린더
+         calendarService.renderCalendar('calendarTestLayout', {
+            plugins: [ 'dayGrid' ],
+            initialView: 'dayGridMonth',
+            events: [
+                {
+                    title: '일정 1',
+                    start: '2024-07-10'
+                },
+                {
+                    title: '일정 2',
+                    start: '2024-07-15'
+                }
+            ]
+         });
+
+         const YM = new Date().toISOString().slice(0, 7); // 현재 년-월 (YYYY-MM 형식)
+         const TODAY = new Date().toISOString().slice(0, 10); // 오늘 날짜 (YYYY-MM-DD 형식)
+         const YESTERDAY = new Date(Date.now() - 864e5).toISOString().slice(0, 10); // 어제 날짜 (YYYY-MM-DD 형식)
+         const TOMORROW = new Date(Date.now() + 864e5).toISOString().slice(0, 10); // 내일 날짜 (YYYY-MM-DD 형식)
+         
+         // 복합 옵션 캘린더
+         calendarService.renderCalendar('calendarTestLayout2', {
+            plugins: ['dayGrid', 'list', 'timeGrid', 'interaction', 'bootstrap'],
+            themeSystem: 'bootstrap',
+            timeZone: 'UTC',
+            buttonText: {
+                today: 'today',
+                month: 'month',
+                week: 'week',
+                day: 'day',
+                list: 'list'
+            },
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                meridiem: 'short'
+            },
+            navLinks: true,
+            header: {
+                left: 'prev,next today addEventButton',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            footer: {
+                left: '',
+                center: '',
+                right: ''
+            },
+            customButtons: {
+                addEventButton: {
+                    text: '+',
+                    click: async function() {
+                        var dateStr = await messageService.showPrompt('Enter a date in YYYY-MM-DD format');
+                        var date = new Date(dateStr + 'T00:00:00');
+
+                        if (!isNaN(date.valueOf())) {
+                           calendar.addEvent({
+                                title: 'dynamic event',
+                                start: date,
+                                allDay: true
+                           });
+                           await messageService.showAlert('Great. Now, update your database...');
+                        } else {
+                           await messageService.showAlert('Invalid date.');
+                        }
+                    }
+                }
+            },
+            editable: true,
+            eventLimit: true,
+            views: {
+                sevenDays: {
+                    type: 'agenda',
+                    buttonText: '7 Days',
+                    visibleRange: function(currentDate) {
+                        return {
+                            start: currentDate.clone().subtract(2, 'days'),
+                            end: currentDate.clone().add(5, 'days')
+                        };
+                    },
+                    duration: {
+                        days: 7
+                    },
+                    dateIncrement: {
+                        days: 1
+                    }
+                }
+            },
+            events: [
+                {
+                    title: 'All Day Event',
+                    start: YM + '-01',
+                    description: 'This is a test description',
+                    className: "border-warning bg-warning text-dark"
+                },
+                {
+                    title: 'Reporting',
+                    start: YM + '-14T13:30:00',
+                    end: YM + '-14',
+                    className: "bg-white border-primary text-primary"
+                },
+                {
+                    title: 'Company Trip',
+                    start: YM + '-02',
+                    end: YM + '-03',
+                    className: "bg-primary border-primary text-white"
+                },
+                {
+                    title: 'NextGen Expo 2019 - Product Release',
+                    start: YM + '-03',
+                    end: YM + '-05',
+                    className: "bg-info border-info text-white"
+                },
+                {
+                    title: 'Dinner',
+                    start: YM + '-12',
+                    end: YM + '-10'
+                },
+                {
+                    id: 999,
+                    title: 'Repeating Event',
+                    start: YM + '-09T16:00:00',
+                    className: "bg-danger border-danger text-white"
+                },
+                {
+                    id: 1000,
+                    title: 'Repeating Event',
+                    start: YM + '-16T16:00:00'
+                },
+                {
+                    title: 'Conference',
+                    start: YESTERDAY,
+                    end: TOMORROW,
+                    className: "bg-success border-success text-white"
+                },
+                {
+                    title: 'Meeting',
+                    start: TODAY + 'T10:30:00',
+                    end: TODAY + 'T12:30:00',
+                    className: "bg-primary text-white border-primary"
+                },
+                {
+                    title: 'Lunch',
+                    start: TODAY + 'T12:00:00',
+                    className: "bg-info border-info"
+                },
+                {
+                    title: 'Meeting',
+                    start: TODAY + 'T14:30:00',
+                    className: "bg-warning text-dark border-warning"
+                },
+                {
+                    title: 'Happy Hour',
+                    start: TODAY + 'T17:30:00',
+                    className: "bg-success border-success text-white"
+                },
+                {
+                    title: 'Dinner',
+                    start: TODAY + 'T20:00:00',
+                    className: "bg-danger border-danger text-white"
+                },
+                {
+                    title: 'Birthday Party',
+                    start: TOMORROW + 'T07:00:00',
+                    className: "bg-primary text-white border-primary text-white"
+                }
+            ]
+         });
+      });
+  </script>
+  
+</div>
+</html>

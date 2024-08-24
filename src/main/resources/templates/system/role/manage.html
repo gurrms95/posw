@@ -1,0 +1,68 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/admin_layout}">
+    <div layout:fragment="content">
+        <div class="row">
+            <div class="col-md-12 col-xl-12">
+               <div id="panel-1" class="panel">
+                  <div class="panel-hdr">
+                        <h2>
+                           역할 목록
+                        </h2>
+                  </div>
+                  <div class="panel-container show">
+                     <div id="role-list-container" class="panel-content">
+                        <table id="role-list" class="table table-bordered table-hover table-striped w-100">
+                          
+                       </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <script type="module">
+
+            import DataTableService from '/common/js/DataTableService.js';
+            
+            $(document).ready(function() {
+
+                const dataToSendUrl = '/system/role/save';
+
+                const roleTable = new DataTableService('#role-list', dataToSendUrl, {
+                    responsive: true,
+                    paging: true,
+                    searching: false,
+                    ordering: true,
+                    info: true,
+                    editMode: true, // 편집 기능 활성화
+                    ajax: {
+                        url: '/system/role/list',
+                        dataSrc: 'roleList'
+                    },
+                    columns: [
+                        { data: 'no', title: '순번', isEdit: false },
+                        { data: 'roleId', title: '역할ID' },
+                        { data: 'roleName', title: '역할명' },
+                        { data: 'roleDescrip', title: '설명' },
+                        { data: 'useYn', title: '사용여부' },
+                        { data: 'inpDt', title: '등록일시', isEdit: false },
+                        { data: 'updDt', title: '수정일시', isEdit: false },
+                    ],
+                    columnDefs: [
+                        { targets: 3, visible: true },
+                        { targets: 4, visible: true }
+                    ],
+                    language: {
+                        lengthMenu: '_MENU_',
+                        zeroRecords: '조건에 맞는 사용자가 존재하지 않습니다.',
+                        info: '총 _PAGES_개 페이지 중 _PAGE_번째 페이지 조회',
+                        infoEmpty: '조회 가능한 데이터가 없습니다.',
+                        infoFiltered: '(filtered from _MAX_ total records)'
+                    },
+                    initComplete: function() {
+                    }
+                });
+        
+            });
+
+        </script>
+    </div>
+</html>

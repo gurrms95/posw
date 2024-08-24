@@ -1,0 +1,271 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+<head>
+    <style>
+        .chartTitle {
+            text-align: center;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        .info-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .info-container p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<div layout:fragment="content">
+    <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+              <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                    <div class="row">
+                        <div class="col-xl-6 order-xl-1">
+                            <div class="card mb-g">
+                                <div class="card-body pb-0 px-4" style="height: 650px">
+                                    <div class="chartTitle">
+                                        <h2><b>상세점수</b></h2>
+                                    </div>
+                                    <div class="info-container">
+                                        <p><b>나의 환경지킴이 점수는 총</b> <span id="totalScore"></span>점</p>
+                                        <p><b>나의 평균점수는</b> <span id="myAvgScore"></span>점</p>
+                                    </div>
+                                    <div class="chart-container" style="margin-top: 30px;">
+                                        <canvas id="doughnutChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 order-xl-2">
+                            <div class="card mb-g">
+                                <div class="card-body pb-0 px-4" style="height: 650px">
+                                    <div class="chartTitle">
+                                        <h2><b>점수분석</b></h2>
+                                    </div>
+                                    <div class="info-container">
+                                        <p><b>전체 사용자의 평균점수는</b> <span id="avgTotalScore"></span>점</p>
+
+                                        <p><b>나는 전체 중 상위</b> <span id="totalScorePercent"></span>%</p>
+                                    </div>
+                                    <div class="chart-container" style="margin-top: 30px;">
+                                        <canvas id="lineChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        // 나의 점수 조회 DTO, 전체 중 나의 순위, % DTO, 전체사용자의 평균점수 DTO
+        /*<![CDATA[*/
+        let envirScoreDTO = JSON.parse(/*[[${jsonEnvirScoreDTO}]]*/ '{}');
+        let envirScoreRankDTO = JSON.parse(/*[[${jsonEnvirScoreRankDTO}]]*/ '{}');
+        let avgScoresDTO = JSON.parse(/*[[${jsonAvgScoresDTO}]]*/ '{}');
+        /*]]>*/
+
+        console.log("나의 점수 조회", envirScoreDTO)
+        console.log("전체 중 나의 순위, %", envirScoreRankDTO)
+        console.log("전체사용자 항목별 평균점수", avgScoresDTO)
+
+        const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+
+        const doughnutData = {
+            labels: ['복용등록점수', '복용완료점수', '배출점수', '기타점수'],
+            datasets: [{
+                label: '점수 분포',
+                data: [
+                    envirScoreDTO.takingAddScore,
+                    envirScoreDTO.takingEndScore,
+                    envirScoreDTO.disposalScore,
+                    envirScoreDTO.etcScore
+                ],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                hoverOffset: 4
+            }]
+        };
+
+        const doughnutChart = new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: doughnutData,
+            plugins: [ChartDataLabels],
+            options: {
+                plugins: {
+                    datalabels: {
+                        display: true, // 항상 데이터 라벨 표시
+                        color: '#000', // 글자 색상
+                        font: {
+                            weight: 'bold',
+                            size: 14 // 숫자 크기
+                        },
+                        formatter: (value, context) => {
+                            return value; // 데이터 값 표시
+                        },
+                        anchor: 'center', // 데이터 라벨이 표시될 위치를 섹션 중앙으로 설정
+                        align: 'center', // 데이터 라벨이 섹션의 중앙에 정렬되도록 설정
+                        offset: 0, // 데이터 라벨의 위치를 중앙에 고정
+                        textStrokeColor: '#fff', // 글자 외곽선 색상 (대비 높이기 위해 흰색 사용)
+                        textStrokeWidth: 2 // 외곽선 두께
+                    }
+                },
+                cutout: '50%', // 도넛 차트 중앙 원의 크기 조절
+                responsive: true,
+                maintainAspectRatio: false
+            },
+            plugins: [{
+                beforeDraw: function(chart) {
+                    var width = chart.width,
+                        height = chart.height,
+                        ctx = chart.ctx;
+                    ctx.restore();
+                    var fontSize = (height / 114).toFixed(2);
+                    ctx.font = fontSize + "em sans-serif";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = '#2196F3';
+                    var text = envirScoreDTO.totalScore + "점",
+                        textX = Math.round((width - ctx.measureText(text).width) / 2),
+                        textY = height / 2 + 30; // 텍스트를 아래로 20픽셀 이동
+                    ctx.fillText(text, textX, textY);
+                    ctx.save();
+                }
+            }]
+        });
+
+
+        // 전체 사용자의 평균 점수 계산
+        const avgTotalScore = (
+            avgScoresDTO.avgTakingAddScore +
+            avgScoresDTO.avgTakingEndScore +
+            avgScoresDTO.avgDisposalScore +
+            avgScoresDTO.avgEtcScore
+        ).toFixed(0);
+
+        // 나의 평균 점수 계산
+        const myAvgScore = (
+            (envirScoreDTO.takingAddScore +
+                envirScoreDTO.takingEndScore +
+                envirScoreDTO.disposalScore +
+                envirScoreDTO.etcScore) / 4
+        ).toFixed(0);
+
+        const lineData = {
+            datasets: [{
+                label: '상위 %',
+                data: [{
+                    x: 10,
+                    y: envirScoreRankDTO.totalScorePercent
+                }],
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                pointRadius: 7,
+                pointHoverRadius: 15
+            },
+                {
+                    label: '전체 사용자 평균점수',
+                    data: [{
+                        x: avgTotalScore,
+                        y: 10
+                    }],
+                    fill: false,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    tension: 0.1,
+                    pointRadius: 7,
+                    pointHoverRadius: 15
+                },
+                {
+                    label: '나의 평균점수',
+                    data: [{
+                        x: myAvgScore,
+                        y: 40 // 임의의 y값을 설정 (필요에 따라 조정 가능)
+                    }],
+                    fill: false,
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgb(54, 162, 235)',
+                    tension: 0.1,
+                    pointRadius: 7,
+                    pointHoverRadius: 15
+                }
+            ]
+        };
+
+        const lineChart = new Chart(lineCtx, {
+            type: 'scatter',
+            data: lineData,
+            options: {
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '점수'
+                        },
+                        ticks: { //눈금
+                            callback: function(value) {
+                                if (value === parseFloat(avgTotalScore)) {
+                                    return '평균 점수: ' + value;
+                                }
+                                return value;
+                            }
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '상위%'
+                        }
+                    }
+                },
+                plugins: {
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        font: {
+                            weight: 'bold',
+                            size: 10 // 글씨 크기 줄이기
+                        },
+                        color: function(context) {
+                            return context.dataset.borderColor; // 글자색을 그래프의 색상과 동일하게 설정
+                        },
+                        formatter: function(value, context) {
+                            if (context.dataset.label === '전체 사용자 평균점수') {
+                                return '전체평균점수: ' + value.x;
+                            }
+                            if (context.dataset.label === '상위 %') {
+                                return '    전체 중 상위: ' + value.y + '%';
+                            }
+                            if (context.dataset.label === '나의 평균점수') {
+                                return '나의평균점수: ' + value.x;
+                            }
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        // 평균 점수 및 상위 퍼센트 표시
+        document.getElementById('totalScore').textContent = envirScoreDTO.totalScore;
+        document.getElementById('avgTotalScore').textContent = avgTotalScore;
+        document.getElementById('myAvgScore').textContent = myAvgScore; // 나의 평균 점수 표시
+        document.getElementById('totalScorePercent').textContent = envirScoreRankDTO.totalScorePercent.toFixed(0);
+    </script>
+</div>
+</html>

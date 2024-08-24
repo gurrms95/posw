@@ -1,0 +1,593 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+    <div layout:fragment="content">
+        <!-- 달력 기능을 위한 링크 및 스타일 적용 시작 -->
+        <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #eaeff1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            #calendar {
+                max-width: 900px;
+                margin: 40px auto;
+                padding: 0 10px;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .card {
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                border: 1px solid #e0e0e0; /* 연한 회색 테두리 */
+            }
+
+            .card-header {
+                background-color: #9fcb3d; /* 초록색 배경 */
+                color: #ffffff;
+                padding: 15px;
+                text-align: center;
+                font-size: 1.5rem; /* 더 큰 폰트 사이즈 */
+                font-weight: bold;
+            }
+
+            .card-content {
+                padding: 20px;
+            }
+
+            .pillContainer {
+                padding: 20px;
+                background-color: #f9f9f9; /* 매우 연한 회색 배경 */
+                border-top: 1px solid #e0e0e0; /* 연한 회색 상단 테두리 */
+                border-radius: 0 0 8px 8px;
+            }
+
+            .btn {
+                display: inline-block;
+                background-color: #9fcb3d; /* 초록색 배경 */
+                color: #ffffff;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                text-align: center;
+                text-decoration: none;
+                font-weight: bold;
+                margin-top: 10px;
+                cursor: pointer;
+                transition: background-color 0.3s ease; /* 부드러운 호버 효과 */
+            }
+
+            .btn:hover {
+                background-color: #1e4d35; /* 버튼 호버 시 어두운 초록색으로 변화 */
+            }
+
+            .pillContainer::before {
+                content: '';
+                display: block;
+                width: 50px;
+                height: 5px;
+                background-color: #f6c90e; /* 노랑색 상단 강조선 */
+                margin-bottom: 10px;
+            }
+            /* 추가적인 디자인 요소 */
+            .icon {
+                width: 24px;
+                height: 24px;
+                vertical-align: middle;
+                margin-right: 10px;
+                fill: #9fcb3d; /* 초록색 아이콘 */
+            }
+            /* 기본 스위치 디자인 숨기기 */
+            .custom-switch {
+                appearance: none;
+                -webkit-appearance: none;
+                width: 50px;
+                height: 28px;
+                background-color: #ccc;
+                border-radius: 34px;
+                position: relative;
+                outline: none;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+            /* 스위치 핸들 디자인 */
+            .custom-switch::before {
+                content: "";
+                position: absolute;
+                width: 22px;
+                height: 22px;
+                background-color: white;
+                border-radius: 50%;
+                top: 3px;
+                left: 3px;
+                transition: transform 0.3s ease;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            /* 스위치가 켜졌을 때 색상 변경 */
+            .custom-switch:checked {
+                background-color: #9fcb3d;
+            }
+
+            /* 스위치가 켜졌을 때 핸들 위치 변경 */
+            .custom-switch:checked::before {
+                transform: translateX(22px);
+            }
+
+            #takingDetailLayout {
+                padding: 20px 60px 20px 60px;
+            }
+        </style>
+        <!-- 달력 기능을 위한 링크 및 스타일 적용 끝 -->
+
+        <!-- 화면 시작 -->
+        <div id="takingDetailLayout" class="row">
+            <div class="col-lg-12 col-xl-6 order-lg-3 order-xl-2">
+                <div class="card mb-g">
+                    <div class="card-header" id="takingNm">
+                        <svg class="header-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+                        </svg>
+                        TAKING.INP_DT 처방전 복용 일정
+                    </div>
+                    <div class="card-content">
+                        <div class="pillContainer">
+                            <!-- 여기에 약 목록이나 복용 관련 정보가 들어갈 수 있습니다. -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 모달 시작 -->
+            <div class="modal fade show" id="pills-insert-modal" tabindex="-1" style="display: none; padding-right: 17px;" aria-modal="true" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                <span id="modalMediNm"></span>
+                                <small class="m-0 text-muted">
+                                    복용 일정 등록
+                                </small>
+                            </h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label pl-1" for="datepicker-modal-2">복용일 선택하기</label>
+                                <div class="input-group">
+                                    <input type="date" id="datepicker-modal-2" class="form-control" placeholder="Select a date">
+                                </div>
+                                <span class="help-block pl-1">해당 약을 드신 날을 선택해주세요.</span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="modalDismissBtn" class="btn btn-secondary waves-effect waves-themed" data-dismiss="modal">닫기</button>
+                            <button type="button" id="saveTkDtBtn" class="btn btn-primary waves-effect waves-themed">등록하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 모달 끝 -->
+
+            <!-- 달력 시작-->
+            <div class="col-lg-12 col-xl-6 order-lg-3 order-xl-2">
+                <div class="card mb-g">
+                    <div class="row row-grid no-gutters">
+                        <div class="col-12">
+                            <div class="p-3 ml-auto">
+                                <div style="display: flex; align-items: center;">
+                                    <span class="mb-0 fs-xl">
+                                    복용 달력😁
+                    ️               </span>
+                                    <div class="form-check form-switch fs-xl" style="margin-left: auto;">
+                                        <label class="form-check-label" for="alarmSwitch">알림 설정
+                                            <input class="form-check-input custom-switch ml-2" type="checkbox" id="alarmSwitch">
+                                            <input id="switchUserId" name="userId" hidden>
+                                            <input id="switchGubun"  name="gubun" hidden>
+                                            <input id="switchInpDt"  name="inpDt" hidden>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div id='calendar'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 달력 끝 -->
+            <!-- 달력 모달창 시작 -->
+            <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="eventModalLabel">복용약 목록</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <ul id="eventList"></ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="modalDismissBtn2" class="btn btn-secondary waves-effect waves-themed" data-dismiss="modal">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 달력 모달창 끝 -->
+        </div>
+        <!-- 화면 끝 -->
+
+
+        <!-- 스크립트 시작 -->
+        <script>
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+            /** document ready */
+            document.addEventListener('DOMContentLoaded', function() {
+                getInitialSetting();
+            });
+
+            /** 전역 변수 초기화 */
+            const paramUserId = `[[${paramUserId}]]`;
+            const paramGubun = `[[${paramGubun}]]`;
+            const paramInpDt = `[[${paramInpDt}]]`;
+            let currentData = {}
+            document.getElementById('switchUserId').value = paramUserId;
+            document.getElementById('switchGubun').value = paramGubun;
+            document.getElementById('switchInpDt').value = paramInpDt;
+
+            /** addEventListener */
+            //아이콘 데이터 세팅
+            document.querySelectorAll('.icon-link').forEach(function(iconLink){
+                iconLink.addEventListener('click', iconDataSetting);
+            });
+            //날짜등록하기
+            document.getElementById('saveTkDtBtn').addEventListener('click', saveTkDtB);
+
+            /** function */
+            //기본 설정
+            function getInitialSetting(){
+                getTakingDetail(function(data){ //화면 기본 데이터 가져오기
+                    setCalendarData(data);      //달력 기본 세팅
+                    updateIcons(data);          //아이콘 업데이트
+                });
+            }
+            //복용 상세 데이터 검색하기
+            function getTakingDetail(callback){
+                const dataToSend = {
+                    userId: paramUserId,
+                    gubun: paramGubun,
+                    inpDt: paramInpDt,
+                };
+
+                fetch('/taking/takingDetailData',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(callback) callback(data);
+                    document.getElementById('takingNm').textContent = data[0].takingNm + ' (' + data[0].inpDt + ')'
+                    document.getElementById('alarmSwitch').checked = data[0].alarm;
+                })
+                .catch(error => {
+                    console.error('Error: ', error);
+                    alert('데이터 저장 중 오류가 발생했습니다.');
+                });
+
+            }
+            //아이콘 데이터 세팅
+            function iconDataSetting(){
+                const icon = this;
+                currentData = {
+                    mediNm: icon.querySelector('.mediNm').value,
+                    tkId: icon.querySelector('.tkId').value,
+                    tkSub: icon.querySelector('.tkSub').value,
+                    userId: icon.querySelector('.userId').value,
+                    gubun: icon.querySelector('.gubun').value,
+                    inpDt: icon.querySelector('.inpDt').value,
+                };
+                document.getElementById('modalMediNm').textContent = currentData.mediNm;
+            }
+            //날짜 삭제하기
+            function deleteTkDt(data){
+                if(!confirm("삭제하시겠습니까?")) return false;
+
+                const dataToSend = {
+                    ...data,
+                    tkDt: null,
+                    tk: 0
+                };
+                //업데이트
+                fetch('/taking/saveTakingDetail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                    .then(response => response.json())
+                    .then(() => {
+                        alert("복용일이 삭제되었습니다.");
+                        //모달 닫기
+                        document.getElementById('modalDismissBtn2').click();
+                        //화면 업데이트
+                        getInitialSetting();
+                    })
+                    .catch(error => {
+                        console.error('Error: ', error);
+                        alert(error);
+                    });
+            }
+            //날짜 등록하기
+            function saveTkDtB(){
+                //복용일저장
+                let tkDt = document.getElementById('datepicker-modal-2').value;
+
+                //날짜 유효성 검사
+                if( !validateDate(tkDt) ){
+                    alert('날짜를 올바르게 입력하세요.');
+                    return false;
+                }
+
+                const dataToSend = {
+                    ...currentData,
+                    tkDt: tkDt,
+                    tk: 1
+                };
+
+                //업데이트
+                fetch('/taking/saveTakingDetail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                .then(response => response.json())
+                .then(() => {
+                    alert("복용일이 저장되었습니다.");
+                    //모달 닫기
+                    document.getElementById('modalDismissBtn').click();
+                    //화면 업데이트
+                    getInitialSetting();
+                })
+                .catch(error => {
+                    console.error('Error: ', error);
+                    alert(error);
+                });
+            }
+
+            //날짜 유효성 검증
+            function validateDate(yyyymmdd) {
+                // 날짜 형식 정규식 (YYYY-MM-DD)
+                const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+                // tkDt가 null이거나 정규식 패턴과 일치하지 않는 경우 false 반환
+                if (!yyyymmdd || !datePattern.test(yyyymmdd)) {
+                    return false;
+                }
+
+                // 날짜 유효성 검사
+                const dateParts = yyyymmdd.split('-');
+                const year = parseInt(dateParts[0], 10);
+                const month = parseInt(dateParts[1], 10);
+                const day = parseInt(dateParts[2], 10);
+
+                // 월이 1-12 사이인지, 일이 1-31 사이인지 확인
+                if (month < 1 || month > 12 || day < 1 || day > 31) {
+                    return false;
+                }
+
+                // 유효한 날짜인지 확인 (예: 2024-02-30 같은 날짜는 없음)
+                const date = new Date(yyyymmdd);
+                if (date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) {
+                    return false;
+                }
+
+                return true;
+            }
+            //아이콘 업데이트
+            function updateIcons(data){
+
+                const pillContainer = document.getElementsByClassName('pillContainer');
+
+                //하위요소 전부 삭제
+                while (pillContainer[0].firstChild) {
+                    pillContainer[0].removeChild(pillContainer[0].firstChild);
+                }
+
+                data.forEach(taking => {
+                    // Create outer div
+                    const outerDiv = document.createElement('div');
+                    outerDiv.className = 'col-12';
+
+                    // Create p-3 d-flex div
+                    const flexDiv = document.createElement('div');
+                    flexDiv.className = 'p-3 d-flex';
+
+                    // Create and append text elements
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'fw-500 fs-md';
+                    nameDiv.textContent = taking.mediNm;
+                    flexDiv.appendChild(nameDiv);
+
+                    const memoSpan = document.createElement('span');
+                    memoSpan.className = 'pl-3';
+                    const memoIcon = document.createElement('i');
+                    memoIcon.textContent = taking.memo;
+                    memoSpan.appendChild(memoIcon);
+                    flexDiv.appendChild(memoSpan);
+
+                    const doseSpan = document.createElement('span');
+                    doseSpan.className = 'ml-auto';
+                    const eatenDose = document.createElement('i');
+                    eatenDose.textContent = taking.eatenDoseCnt;
+                    const slash = document.createElement('span');
+                    slash.textContent = '/';
+                    const totalDose = document.createElement('i');
+                    totalDose.textContent = taking.totalDoseCnt;
+                    const info = document.createElement('span');
+                    info.textContent = ' (먹음/총량)';
+                    doseSpan.appendChild(eatenDose);
+                    doseSpan.appendChild(slash);
+                    doseSpan.appendChild(totalDose);
+                    doseSpan.appendChild(info);
+                    flexDiv.appendChild(doseSpan);
+
+                    outerDiv.appendChild(flexDiv);
+
+                    // Create p-3 div for icons
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'p-3';
+
+                    taking.takingDetailDTOList.forEach(detail => {
+                        if ( !detail.tk ) {
+                            const link = document.createElement('a');
+                            link.href = 'javascript:void(0);';
+                            link.className = 'waves-effect icon-link';
+                            link.style.color = 'grey';
+                            link.dataset.toggle = 'modal';
+                            link.dataset.target = '#pills-insert-modal';
+
+                            const icon = document.createElement('i');
+                            icon.className = 'pl-2 fa-3x fal fa-pills';
+                            icon.addEventListener('click', iconDataSetting);
+
+                            // Add input elements to the icon
+                            const inputs = [
+                                { className: 'mediNm', value: taking.mediNm },
+                                { className: 'tkId', value: detail.tkId },
+                                { className: 'tkSub', value: detail.tkSub },
+                                { className: 'userId', value: detail.userId },
+                                { className: 'gubun', value: detail.gubun },
+                                { className: 'inpDt', value: detail.inpDt }
+                            ];
+
+                            inputs.forEach(input => {
+                                const inputElement = document.createElement('input');
+                                inputElement.className = input.className;
+                                inputElement.defaultValue = input.value || '';
+                                inputElement.hidden = true;
+                                icon.appendChild(inputElement);
+                            });
+
+                            link.appendChild(icon);
+                            iconDiv.appendChild(link);
+                        }
+                    });
+
+                    outerDiv.appendChild(iconDiv);
+                    pillContainer[0].appendChild(outerDiv);
+                });
+            }
+            //달력 기본 세팅
+            function setCalendarData(data){
+                //data 달력형식으로 포매팅
+                let calendarData = [];
+                data.forEach(taking => {
+                    taking.takingDetailDTOList.forEach(detail => {
+                        let inputData = {
+                            tkId:detail.tkId,
+                            tkSub:detail.tkSub,
+                            userId:detail.userId,
+                            gubun:detail.gubun,
+                            inpDt:detail.inpDt,
+                            title: taking.mediNm,
+                            start: detail.tkDt,
+                        };
+                        calendarData.push(inputData);
+                    });
+                });
+
+                let calendarEl = document.getElementById('calendar');
+                let calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    // plugins: [ 'dayGrid', 'interaction' ],
+                    editable: true,
+                    locale: 'ko', // 한글 로케일 설정
+                    headerToolbar: {
+                        left: 'prev today',
+                        center: 'title',
+                        right: 'next',
+                    },
+                    events: calendarData,
+                    displayEventTime:false,
+                    editable: false,
+                    dayMaxEventRows: true,
+                    eventClick: function(info) {
+                        let tkDetailDTO = info.event._def.extendedProps;
+                        let eventList = document.getElementById('eventList');
+                        eventList.innerHTML = '';
+
+                        let listItem = document.createElement('li');
+                        listItem.textContent = info.event.title + ' (' + tkDetailDTO.inpDt + "일 복용)";
+
+                        const aItem = document.createElement('a');
+                        aItem.href = 'javascript:void(0);';
+                        aItem.className = 'btn btn-danger btn-xs waves-effect waves-themed m-3 fal fa-times';
+                        aItem.addEventListener('click', () => deleteTkDt(tkDetailDTO));
+
+                        // 아이콘을 생성하여 버튼에 추가
+                        // const icon = document.createElement('i');
+                        // icon.className = '';
+
+                        // aItem.appendChild(icon);
+                        listItem.appendChild(aItem);
+                        eventList.appendChild(listItem);
+
+                        $('#eventModal').modal('show');
+                        return false; // 기본 동작 방지
+                    }
+                });
+                calendar.render();
+                //알림 설정
+                $("#alarmSwitch").change(function(){
+                    const label = this.parentElement;
+                    const hiddenInput = label.querySelectorAll('input');
+                    let dataToSend = {};
+                    hiddenInput.forEach(input => {
+                        dataToSend[input.name] = input.value;
+                    });
+                    dataToSend['alarm'] = this.checked;
+
+                    fetch('/alarm/saveAlarm', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify(dataToSend)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            console.error('Error: ', error);
+                            alert(error);
+                        });
+                });
+            }
+        </script>
+        <!-- 스크립트 끝 -->
+    </div>
+
+</html>

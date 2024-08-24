@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 복용약</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding-bottom: 70px; /* 푸터 공간 확보 */
+            color: #343a40;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            background: #ffffff;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .card h5 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .card p {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-default {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .btn-default:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        /* 고정 푸터 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+            padding: 10px 20px;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #dontShowToday {
+            margin-right: 8px;
+        }
+
+        label {
+            font-size: 1rem;
+            color: #343a40;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-xl-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 th:text="'오늘의 복용약 ('+${alarmList[0].today}+')'">오늘의 복용약</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:each="alarm: ${alarmList}">
+        <div class="row justify-content-center" th:if="${alarm.alarmDetailDTOList != null and alarm.alarmDetailDTOList.size() > 0}">
+            <div class="col-lg-12 col-xl-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 th:text="${alarm.takingNm}">알림 이름</h5>
+                        <div th:each="detail : ${alarm.alarmDetailDTOList}">
+                            <p>
+                                <span th:text="${detail.mediNm} + ' [' + ${detail.memo} + '] : '"></span>
+                                <span th:text="'오늘 ' + ${detail.dailyDoseCnt} + '회 중 ' + ${detail.todayEatenDoseCnt} + '회 먹었습니다. (' + ${detail.eatenDoseCnt} + '/' + ${detail.totalDoseCnt} + ')'">
+                                        알림 상세 내용
+                                    </span>
+                            </p>
+                        </div>
+                        <button type="button" name="takingDetailBtn" th:value="${alarm.userId} + '/' + ${alarm.gubun} + '/' + ${alarm.inpDt}" class="btn btn-default btn-sm">상세이동</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 고정 푸터 -->
+<div class="footer">
+    <label>
+        <input type="checkbox" id="dontShowToday"> 오늘 하루 안 보기
+    </label>
+    <button id="closePopup" class="btn btn-sm btn-danger">닫기</button>
+</div>
+
+<script type="module">
+    import AlarmService from '/common/js/AlarmService.js';
+
+    const alarmService = new AlarmService();
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        //상세보기로 이동 이벤트 넣어주기
+        document.getElementsByName('takingDetailBtn').forEach(btn => {
+            btn.addEventListener('click', moveTakingDetail);
+        });
+
+        //팝업창 닫기
+        document.getElementById('closePopup').addEventListener('click', closePopup);
+    });
+
+    //상세보기 이동
+    function moveTakingDetail() {
+        const urlParam = this.value;
+        if (window.opener) {
+            window.opener.location.href = '/taking/takingDetail/' + urlParam;
+        }
+        window.close();
+    }
+
+    //팝업창 닫기
+    function closePopup() {
+        const dontShowToday = document.getElementById('dontShowToday');
+
+        if (dontShowToday.checked) {
+            alarmService.setCookie('hidePopup', 'true', 1);
+        }
+        window.close();
+    }
+</script>
+</body>
+
+</html>

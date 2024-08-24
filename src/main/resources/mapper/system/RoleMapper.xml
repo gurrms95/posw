@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.omid.osw.system.role.mapper.RoleMapper">
+
+    <!-- 역할(ROLE) 목록 조회 -->
+    <select id="getRoleList" resultType="RoleDTO" parameterType="RoleSerchDTO">
+        /* RoleMapper.getRoleList */
+        SELECT
+              ROW_NUMBER() OVER (ORDER BY INP_DT DESC) AS NO -- 순번 (등록일시순)
+            , ROLE_ID
+            , ROLE_NAME
+            , ROLE_DESCRIP
+            , USE_YN
+            , INP_DT
+            , UPD_DT
+        FROM CMMN_ROLE
+        ORDER BY USE_YN ASC
+    </select>
+
+    <!-- 역할(ROLE) 신규 등록 -->
+    <insert id="addRole" parameterType="RoleDTO">
+        /* RoleMapper.addRole */
+        INSERT INTO CMMN_ROLE
+        ( ROLE_ID
+        , ROLE_NAME
+        , ROLE_DESCRIP
+        , USE_YN
+        , INP_ID
+        , INP_DT
+        , UPD_ID
+        , UPD_DT
+        ) VALUES
+        ( #{roleId}
+        , #{roleName}
+        , #{roleDescrip}
+        , #{useYn}
+        , #{userId}
+        , NOW()
+        , #{userId}
+        , NOW()
+        )
+    </insert>
+
+    <!-- 역할(ROLE) 수정 -->
+    <update id="modifyRole" parameterType="RoleDTO">
+        /* RoleMapper.modifyRole */
+        UPDATE CMMN_ROLE
+           SET ROLE_NAME = #{roleName}
+             , ROLE_DESCRIP = #{roleDescrip}
+             , USE_YN = #{useYn}
+             , UPD_ID = #{userId}
+             , UPD_DT = NOW()
+         WHERE ROLE_ID = #{roleId}
+    </update>
+
+    <!-- 역할(ROLE) 삭제 -->
+    <delete id="removeRole" parameterType="RoleDTO">
+        /* RoleMapper.removeRole */
+        DELETE FROM CMMN_ROLE WHERE ROLE_ID = #{roleId}
+    </delete>
+
+    <!-- 사용자 역할(ROLE) 매핑 목록 조회 -->
+    <select id="getRoleUserMappingList" resultType="RoleMappingDTO" parameterType="RoleMappingSerchDTO">
+        /* RoleMapper.getRoleUserMappingList */
+        SELECT
+              ROW_NUMBER() OVER (ORDER BY B.USER_KORN_NAM) AS NO -- 순번 (등록일시순)
+            , C.ROLE_ID -- 역할ID
+            , A.USER_ID -- 사용자계정아이디
+            , B.USER_KORN_NAM -- 한글성명
+            , B.GENDER_SEC_NAE -- 성별구분명
+        FROM
+            CMMN_USER A
+        INNER JOIN
+            CMMN_IN_USER_INFO B
+            ON A.USER_SEN = B.USER_SEN
+        INNER JOIN
+            CMMN_ROLE_USER_MAPNG C
+            ON A.USER_ID = C.USER_ID
+            AND C.ROLE_ID = #{roleId}
+    </select>
+
+    <!-- 사용자 역할(ROLE) 매핑 신규 등록 -->
+    <insert id="addRoleUserMapping" parameterType="RoleMappingDTO">
+        /* RoleMapper.addRoleUserMapping */
+        INSERT INTO CMMN_ROLE_USER_MAPNG
+        ( ROLE_ID
+        , USER_ID
+        , INP_ID
+        , INP_DT
+        , UPD_ID
+        , UPD_DT
+        ) VALUES
+        ( #{roleId}
+        , #{userId}
+        , #{inpId}
+        , NOW()
+        , #{updId}
+        , NOW()
+        )
+    </insert>
+
+    <!-- 사용자 역할(ROLE) 매핑 삭제 -->
+    <delete id="removeRoleUserMapping" parameterType="RoleMappingDTO">
+        /* RoleMapper.removeRoleUserMapping */
+        DELETE FROM CMMN_ROLE_USER_MAPNG WHERE ROLE_ID = #{roleId} AND USER_ID = #{userId}
+    </delete>
+
+</mapper>

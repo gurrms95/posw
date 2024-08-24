@@ -1,0 +1,81 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+    <div layout:fragment="content">
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-warning">
+                                    <span class="h5">잠깐! 복용 중이신 약이 있으신가요?</span>
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md">
+                                            약사의 복약 지도에 맞게 알림 시간을 설정해 주세요!
+                                        </div>
+                                        <div class="col-auto mt-3 mt-sm-0">
+                                            <a href="/taking/scheduleList" class="btn btn-primary waves-effect waves-themed">알림설정하기</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-6 mb-4">
+                                        <div class="card h-100 rounded overflow-hidden position-relative">
+                                            <div class="card-body p-4">
+                                                <div class="d-flex align-items-center mb-g">
+                                                    <img src="/images/taking_medi.jpg" class="mr-3">
+                                                    <h1 class="fw-300 m-0 l-h-n">
+                                                        <span class="text-contrast">최근 복용중인 약</span>
+                                                        <small class="fw-300 m-0 l-h-n">
+                                                            a medication that is currently being taken
+                                                        </small>
+                                                    </h1>
+                                                </div>
+                                                <div class="col">
+                                                    <ul class="mt-3 list-spaced">
+                                                        <li th:if="${#lists.isEmpty(latestTakingList)}">
+                                                            복용중인 약이 없어요
+                                                        </li>
+                                                        <li th:each="taking : ${latestTakingList}">
+                                                            <span th:text="${taking.mediNm}"></span>
+                                                        </li>
+                                                    </ul>
+                                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#medication-hand-regist">복용중인 약 - 등록하기</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 mb-4">
+                                        <!-- PHP Flavor -->
+                                        <div class="card h-100 rounded overflow-hidden">
+                                            <div class="card-body p-4">
+                                                <div class="d-flex align-items-center mb-g">
+                                                    <img src="/images/taked_medi.jpg" class="mr-3">
+                                                    <h1 class="fw-300 m-0 l-h-n">
+                                                        <span class="text-contrast">최근 복용했던 약</span>
+                                                        <small class="fw-300 m-0 l-h-n">
+                                                            a medication taken recently
+                                                        </small>
+                                                    </h1>
+                                                </div>
+                                                <div class="col">
+                                                    <ul class="mt-3 list-spaced">
+                                                        <li th:if="${#lists.isEmpty(latestTakedList)}">
+                                                            복용했던 약이 없어요
+                                                        </li>
+                                                        <li th:each="taked : ${latestTakedList}">
+                                                            <span th:text="${taked.mediNm}"></span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>

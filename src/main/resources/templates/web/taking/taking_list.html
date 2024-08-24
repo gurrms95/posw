@@ -1,0 +1,81 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+    <div layout:fragment="content">
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12">
+                               <div class="panel">
+                                  <div class="panel-container show">
+                                     <div class="panel-content">
+                                        <table id="searchingListDataTable" class="table table-bordered table-hover table-striped w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>이름</th>
+                                                    <th>포지션</th>
+                                                    <th>활동지역</th>
+                                                    <th>나이</th>
+                                                    <th>경력시작일</th>
+                                                    <th>연봉</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="module">
+      
+            $(document).ready(function() {
+                var table = $('#searchingListDataTable').DataTable({
+                    responsive: true, // 반응형 테이블 설정
+                    paging: true, // 페이징 활성화
+                    searching: false, // 검색 필터 활성화
+                    ordering: true, // 정렬 기능 활성화
+                    info: true, // 정보 표시 활성화
+                    ajax: {
+                        url: '/ajaxTest/getDataTableData', // 데이터 요청 URL
+                        dataSrc: 'data' // 응답 데이터 경로
+                    },
+                    columns: [
+                        { data: 'no', title: 'No' },
+                        { data: 'name', title: 'Name' },
+                        { data: 'position', title: 'Position' },
+                        { data: 'office', title: 'Office' },
+                        { data: 'age', title: 'Age' },
+                        { data: 'startDate', title: 'Start Date' },
+                        { data: 'salary', title: 'Salary' }
+                    ],
+                    columnDefs: [
+                        { targets: 3, visible: true }, // 특정 열 설정 예시
+                        { targets: 4, visible: true }  // 특정 열 설정 예시
+                    ],
+                    language: {
+                        lengthMenu: 'Show _MENU_ entries', // 사용자 지정 문구
+                        zeroRecords: 'Nothing found - sorry', // 사용자 지정 문구
+                        info: 'Showing page _PAGE_ of _PAGES_', // 사용자 지정 문구
+                        infoEmpty: '조회 가능한 데이터가 없습니다.', // 사용자 지정 문구
+                        infoFiltered: '(filtered from _MAX_ total records)' // 사용자 지정 문구
+                    }
+                });
+
+                // 행 클릭 이벤트 처리
+                $('#searchingListDataTable').on('click', 'tr', function() {
+                    var data = table.row(this).data();
+                    alert('클릭한 행 번호 : ' + data.no + '번');
+                });
+            });
+
+        </script>
+    </div>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+<head>
+  <style>
+    .map_wrap {
+      width: 100%;
+      height: 100%;
+      max-width: 1100px;
+      max-height: 600px;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<div layout:fragment="content">
+  <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${MAPKEY} + '&libraries=services,clusterer,drawing'"></script>
+  <div class="page-wrapper auth">
+    <div class="page-inner bg-brand-gradient">
+      <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+        <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+          <div class="row">
+            <div class="col-xl-12">
+              <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                포인트 쌓기
+                <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60 hidden-sm-down">
+                  우리동네 폐의약품 수거함을 찾아서 포인트를 쌓아보아요
+                </small>
+              </h2>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-12">
+              <div class="card mb-g">
+                <div class="card-body pb-0 px-4" style="height: 630px;">
+                  <div class="map_wrap">
+                    <div id="map"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import MessageService from '/common/js/MessageService.js';
+    window.messageService = new MessageService();
+  </script>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let mboxList = /*[[${WMCB}]]*/'{}';
+    let mboxData = JSON.parse(mboxList);
+    let userId = /*[[${USERID}]]*/'{}';
+    /*]]>*/
+    function getPoint(e){
+      // const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 하루(24시간)의 밀리초 단위 시간
+      const oneDayInMilliseconds = 60 * 1000;
+      const now = new Date().getTime(); // 현재 시간의 타임스탬프
+
+      let mediName = e.target.getAttribute('data-name');
+      let userData = localStorage.getItem(userId);
+
+      if(!userData){
+        userData = {
+          timestamp: now,
+          data:[]
+        }
+      } else {
+        userData = JSON.parse(userData);
+
+        if(userData){
+          if(userData.data.some((data,i) => data === mediName)){
+            // alert("적립된 곳입니다.");
+            window.messageService.showAlert('적립된 곳입니다.');
+            return;
+          }
+        }
+
+        if((now - userData.timestamp) > oneDayInMilliseconds){
+          userData = {
+            timestamp:now,
+            data:[]
+          }
+        }
+      }
+      userData.data.push(mediName);
+      localStorage.setItem(userId, JSON.stringify(userData));
+
+      // 환경지킴이 점수 등록 부분
+      const { fromEvent, from, merge } = rxjs;
+      const { ajax } = rxjs.ajax;
+      const csrfToken = $('meta[name="_csrf"]').attr('content');
+      const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+      let envirScoreDTO = {
+        userId: userId,
+        disposalScore: 5
+      };
+
+      $.ajax({
+        url: '/envir_score/saveEnvirScore',
+        method: 'POST',
+        contentType: 'application/json',
+        headers: {
+          [csrfHeader]: csrfToken  // 동적으로 헤더 설정
+        },
+        data: JSON.stringify(envirScoreDTO),
+        success: function(response) {
+          // alert("포인트적립!!");
+          window.messageService.showAlert('포인트적립!!');
+        },
+        error: function(error) {
+          console.error("점수 등록에 실패했습니다:", error);
+          window.messageService.showError('점수 등록에 실패했습니다.');
+          // alert("점수 등록 실패");
+        }
+      });
+    }
+  </script>
+
+  <script type="module">
+    import KakaoMapService from '/common/js/KakaoMapService.js';
+
+    let map;
+    let marker;
+    let watchId;
+    let circle = null;
+
+    let container = document.querySelectorAll("#map");
+    let jsonMbox = JSON.parse(mboxData.body);
+
+    let kakaMap = new KakaoMapService();
+
+    //let myLoc =  await  kakaMap.getMyLocation();
+    let myLoc = {
+      lat:36.4854059,
+      lon:127.3016856
+    }
+    let addList = [];
+    let markers = [];
+
+    function initMap() {
+      // 카카오맵 생성
+      map = kakaMap.setKakaoMap(container,myLoc);
+
+      //3레벌까지만 축소가능
+      map.setMaxLevel(3);
+
+      // 마커 생성
+      marker = new kakao.maps.Marker({
+        map: map,
+        position: new kakao.maps.LatLng(37.5665, 126.978),
+        image: kakaMap.setMarkerImage({width:25,height:25})
+      });
+
+      // 위치 추적 시작
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(
+                updatePosition,
+                handleError,
+                {
+                  enableHighAccuracy: true,
+                  timeout: 5000,
+                  maximumAge: 0
+                }
+        );
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+    }
+
+    async function updatePosition(position) {
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
+      let newPosition = new kakao.maps.LatLng(lat, lon);
+      myLoc = {lat:lat, lon:lon};
+      let myAddress = await kakaMap.getCoordSearch(myLoc);
+
+      addfilterMbox(filterMbox(myAddress));
+      removeMarker();
+
+      let addToCoor = await kakaMap.getAddressSearch(addList);
+
+      //내주변 --M안에 있는 좌표찾기
+      let nearbyCoordinates = kakaMap.filterCoordinatesWithinRadius(myLoc,addToCoor,1000);
+
+      //카카오맵에 마커넣기
+      let aroundMarker = kakaMap.setMarker(map,nearbyCoordinates);
+
+      for(let i = 0 ; i < aroundMarker.length; i++){
+        markers.push(aroundMarker[i]);
+      }
+
+      let nearbyPoint = kakaMap.filterMarkerWithinRadius(myLoc,markers,nearbyCoordinates,250);
+
+      if(nearbyPoint.length > 0){
+        let userData = localStorage.getItem(userId);
+        userData = JSON.parse(userData);
+
+        // 마커에 클릭이벤트를 등록합니다
+        for(let i = 0 ; i < nearbyPoint.length; i++){
+            let iwContent = '<button data-name='+nearbyPoint[i].name+' onclick="getPoint(event)" class="btn btn-primary" type="button" style="font-weight: bold">DROP</button>';
+            let iwRemoveable = true;
+
+            let infowindow = new kakao.maps.InfoWindow({
+              content : iwContent,
+              removable : iwRemoveable
+            });
+
+            kakao.maps.event.addListener(nearbyPoint[i].marker, 'click', function() {
+            // 마커 위에 인포윈도우를 표시합니다
+            infowindow.open(map, nearbyPoint[i].marker);
+          });
+        }
+      }
+      // 마커 위치 업데이트
+      marker.setPosition(newPosition);
+
+      if(circle === null){
+        circle = await kakaMap.setDrawCircleReturn(myLoc,250);
+        circle.setMap(map);
+      } else {
+        circle.setPosition(newPosition);
+      }
+
+      // 지도 중심 위치 업데이트
+      map.setCenter(newPosition);
+
+    }
+
+    function handleError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          console.log("User denied the request for Geolocation.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          console.log("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          console.log("The request to get user location timed out.");
+          break;
+        case error.UNKNOWN_ERROR:
+          console.log("An unknown error occurred.");
+          break;
+      }
+    }
+
+    function filterMbox(myAddress){
+      return  Object.keys(jsonMbox).reduce((result,key)=>{
+        let value = jsonMbox[key];
+
+        if(typeof  value === 'object' && value !== null){
+          for (const prop in value) {
+            //myAddress.address.region_3depth_name
+            if (String(value[prop]).includes(myAddress.address.region_3depth_name)) {
+              result[key] = value;
+              break;
+            }
+          }
+        } else if(String(value).includes(myAddress.address.region_3depth_name)) {
+          result[key] = value;
+        }
+        return result;
+      }, {});
+    }
+
+    function addfilterMbox(fiterMbox){
+      return Object.values(fiterMbox).forEach(function (box){
+        addList.push({"name":box['수거함 명칭'],"dAddress":box['도로명주소'],"gAddress":box['지번주소']});
+      })
+    }
+
+    // 지도 위에 표시되고 있는 마커를 모두 제거합니다
+    function removeMarker() {
+      for ( let i = 0; i < markers.length; i++ ) {
+        markers[i].setMap(null);
+      }
+      markers = [];
+    }
+
+    // 페이지 로드 시 지도와 위치 추적 초기화
+    window.onload = initMap;
+  </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!-- 해당 레이아웃에는 전체 페이지에서 공통으로 열기 위한 상단 모달만 추가, 특정 페이지에서만 필요한 상단 모달은 해당 페이지에 개별적으로 추가 필요. -->
+<!-- 상단 히든 모달 레이아웃 시작 -->
+<div th:fragment="hidden_top_modal" class="modal fade modal-backdrop-transparent" id="modal-shortcut" tabindex="-1" role="dialog" aria-labelledby="modal-shortcut" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-top modal-transparent" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <ul class="app-list w-auto h-auto p-0 text-left">
+                    <li>
+                        <a href="/" class="app-list-item text-white border-0 m-0">
+                            <div class="icon-stack">
+                                <i class="base base-7 icon-stack-3x opacity-100 color-primary-500 "></i>
+                                <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
+                                <i class="fal fa-home icon-stack-1x opacity-100 color-white"></i>
+                            </div>
+                            <span class="app-list-name">
+                                홈
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/system/user/manage" class="app-list-item text-white border-0 m-0">
+                            <div class="icon-stack">
+                                <i class="base base-7 icon-stack-2x opacity-100 color-primary-300 "></i>
+                                <i class="fal fa-plus icon-stack-1x opacity-100 color-white"></i>
+                            </div>
+                            <span class="app-list-name">
+                                시스템관리
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 상단 히든 모달 레이아웃 종료 -->

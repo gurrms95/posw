@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>세종특별자치시 약국 현황, 폐의약품 수거함 현황</title>
+    <style>
+        .tab {
+            cursor: pointer;
+            padding: 10px 20px;
+            display: inline-block;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+        .tab.active {
+            background-color: #ffffff;
+            border-bottom: 1px solid #ffffff;
+        }
+        .tab-content {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
+                    this.classList.add('active');
+                    document.querySelector(`#${this.dataset.target}`).classList.add('active');
+                });
+            });
+
+            fetch('/api/pharmacy_api')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#pharmaciesTable tbody');
+                    tableBody.innerHTML = '';
+
+                    data.forEach(function(pharmacy) {
+                        const row = document.createElement('tr');
+
+                        const cell1 = document.createElement('td');
+                        cell1.textContent = pharmacy['순번'];
+                        row.appendChild(cell1);
+
+                        const cell2 = document.createElement('td');
+                        cell2.textContent = pharmacy['약국명칭'];
+                        row.appendChild(cell2);
+
+                        const cell3 = document.createElement('td');
+                        cell3.textContent = pharmacy['약국소재지(도로명)'];
+                        row.appendChild(cell3);
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error("약국 데이터 에러", error);
+                });
+
+            fetch('/api/wmcb_api')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#collectionBoxTable tbody');
+                    tableBody.innerHTML = '';
+
+                    data.forEach(function(box) {
+                        const row = document.createElement('tr');
+
+                        const cell1 = document.createElement('td');
+                        cell1.textContent = box['순번'];
+                        row.appendChild(cell1);
+
+                        const cell2 = document.createElement('td');
+                        cell2.textContent = box['수거함 명칭'];
+                        row.appendChild(cell2);
+
+                        const cell3 = document.createElement('td');
+                        cell3.textContent = box['도로명주소'];
+                        row.appendChild(cell3);
+
+                        const cell4 = document.createElement('td');
+                        cell4.textContent = box['지번주소'];
+                        row.appendChild(cell4);
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error("폐의약품 수거함 데이터 에러", error);
+                });
+        });
+    </script>
+</head>
+<body>
+<h1>세종특별자치시 약국 현황, 폐의약품 수거함 현황</h1>
+<div>
+    <div class="tab active" data-target="pharmacies">약국 현황</div>
+    <div class="tab" data-target="collectionBoxes">폐의약품 수거함 현황</div>
+</div>
+<div id="pharmacies" class="tab-content active">
+    <table id="pharmaciesTable">
+        <thead>
+        <tr>
+            <th>순번</th>
+            <th>약국명칭</th>
+            <th>약국소재지(도로명)</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<div id="collectionBoxes" class="tab-content">
+    <table id="collectionBoxTable">
+        <thead>
+        <tr>
+            <th>순번</th>
+            <th>수거함 명칭</th>
+            <th>도로명주소</th>
+            <th>지번주소</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

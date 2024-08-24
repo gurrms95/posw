@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.omid.osw.web.taking.mapper.TakingMapper">
+
+
+    <!-- 복용 등록 -->
+    <insert id="insertTaking" parameterType="TakingDTO">
+        /* TakingMapper.insertTaking */
+        INSERT INTO TAKING
+            (TAKING_ID
+            ,TAKING_NM
+            ,MEDI_NM
+            ,TAKING_START_DT
+            ,ALL_TAKING_DT
+            ,DRUG_CONTENT
+            ,DAILY_DOSE
+            ,DAILY_DOSE_CNT
+            ,MEMO
+            ,GUBUN
+            ,USER_ID
+            ,INP_DT)
+        VALUES
+            (#{takingId}
+              , #{takingNm}
+              , #{mediNm}
+              ,<choose>
+                <when test="takingStartDt != null and takingStartDt != ''">
+                    DATE_FORMAT(#{takingStartDt}, '%Y-%m-%d')
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+               </choose>
+              , #{allTakingDt}
+              , #{drugContent}
+              , #{dailyDose}
+              ,#{dailyDoseCnt}
+              ,#{memo}
+              ,#{gubun}
+              ,#{userId}
+              ,#{inpDt})
+    </insert>
+
+    <!-- 구분 값 가져오기 -->
+    <select id="getMaxGubunByDate" resultType="int" parameterType="String">
+        /* TakingMapper.getMaxGubunByDate */
+        <![CDATA[
+        SELECT COALESCE(MAX(GUBUN), 0)
+        FROM TAKING
+        WHERE INP_DT >= #{inpDt} AND INP_DT < DATE_ADD(#{inpDt}, INTERVAL 1 DAY)
+        ]]>
+    </select>
+
+    <!-- 최근 복용중/복용완료 가져오기 -->
+    <select id="getLatestTakingState" resultType="TakingDTO" parameterType="String">
+        /* TakingMapper.getLatestTakingState */
+        WITH LATESTTAKING AS (
+            SELECT GUBUN, TAKING_START_DT
+            FROM TAKING
+            WHERE TAKING_STATE = ${takingState}
+              AND USER_ID = #{userId}
+            ORDER BY TAKING_START_DT DESC, TAKING_ID DESC
+            LIMIT 1
+            )
+        SELECT t.*
+        FROM TAKING t
+                 JOIN LATESTTAKING lt ON t.GUBUN = lt.GUBUN AND t.TAKING_START_DT = lt.TAKING_START_DT
+        WHERE t.TAKING_STATE = ${takingState}
+          AND t.USER_ID = #{userId}
+    </select>
+
+    <!-- 복용 일정 -->
+    <select id="getTakingScheduleList" resultType="TakingDTO" parameterType="TakingDTO">
+        /* TakingMapper.getTakingScheduleList */
+        SELECT TAKING_ID
+             , MEDI_NM
+             , TAKING_START_DT
+             , ALL_TAKING_DT
+             , DRUG_CONTENT
+             , DAILY_DOSE
+             , DAILY_DOSE_CNT
+             , MEMO
+             , GUBUN
+             , USER_ID
+             , TAKING_STATE
+             , TAKING_NM
+             , INP_DT
+             , IS_ALARM
+             , (ALL_TAKING_DT * DAILY_DOSE_CNT) AS TOTAL_DOSE_CNT
+             , (SELECT COUNT(1) FROM TAKING_DETAIL B WHERE 1=1 AND A.TAKING_ID = B.TK_ID AND A.GUBUN = B.GUBUN AND B.INP_DT = DATE_FORMAT(A.INP_DT, '%Y-%m-%d') AND B.IS_TK = TRUE) AS EATEN_DOSE_CNT
+          FROM TAKING A
+         WHERE 1=1
+        <if test="userId != null and userId != ''">
+           AND USER_ID = #{userId}
+        </if>
+        <if test="gubun != null and gubun != ''">
+           AND GUBUN = #{gubun}
+        </if>
+        <if test="inpDt != null and inpDt != ''">
+           AND INP_DT = #{inpDt}
+        </if>
+        <if test="takingId != null and takingId != ''">
+            AND TAKING_ID = #{takingId}
+        </if>
+        ORDER BY INP_DT DESC
+    </select>
+
+    <!-- 복용 상세 -->
+    <select id="getTakingDetailList" resultType="TakingDetailDTO" parameterType="TakingDetailDTO">
+        /* TakingMapper.getTakingDetailList */
+        SELECT *
+        FROM TAKING_DETAIL
+        WHERE 1=1
+        <if test="userId != null and userId != ''">
+            AND USER_ID = #{userId}
+        </if>
+        <if test="gubun != null and gubun != ''">
+            AND GUBUN = #{gubun}
+        </if>
+        <if test="inpDt != null and inpDt != ''">
+            AND INP_DT = DATE_FORMAT(STR_TO_DATE(#{inpDt}, '%Y-%m-%d %H:%i:%s'), '%Y-%m-%d')
+        </if>
+        <if test="tkId != null and tkId != ''">
+            AND TK_ID = #{tkId}
+        </if>
+    </select>
+
+    <update id="saveTakingDetail" parameterType="TakingDetailDTO">
+        /** TakingMapper.saveTakingDetail */
+        UPDATE TAKING_DETAIL
+           SET TK_DT = #{tkDt}
+             , IS_TK = #{isTk}
+         WHERE 1=1
+           AND TK_ID = #{tkId}
+           AND TK_SUB = #{tkSub}
+           AND USER_ID = #{userId}
+           AND GUBUN = #{gubun}
+           AND INP_DT = #{inpDt}
+    </update>
+
+    <!-- 복용 상세 저장 -->
+    <insert id="insertTakingDetail" parameterType="TakingDetailDTO">
+        /** TakingMapper.insertTakingDetail */
+        INSERT INTO TAKING_DETAIL
+            (
+             TK_ID
+            ,TK_SUB
+            ,USER_ID
+            ,GUBUN
+            ,INP_DT
+            )
+        VALUES(
+            #{tkId}
+            ,#{tkSub}
+            ,#{userId}
+            ,#{gubun}
+            ,#{inpDt}
+        )
+
+
+    </insert>
+
+    <!-- 가장 최근에 삽입된 Taking_id 키 값을 가져온다. -->
+    <select id="getLatestTakingId" resultType="int">
+        SELECT LAST_INSERT_ID();
+    </select>
+
+    <!-- 남은 투약 횟수를 파악하여 복용 완료 여부를 확인한다. -->
+    <select id="checkLastDetail" resultType="int">
+        SELECT COUNT(1)
+          FROM TAKING_DETAIL
+         WHERE 1=1
+           AND TK_ID = #{tkId}
+           AND USER_ID = #{userId}
+           AND GUBUN = #{gubun}
+           AND INP_DT = #{inpDt}
+           AND NVL(IS_TK, '0') = '0'
+    </select>
+    <!-- 복용 상태를 완료로 저장한다. -->
+    <update id="saveTakingState" parameterType="takingDTO">
+        UPDATE TAKING
+           SET TAKING_STATE = 1
+         WHERE 1=1
+           AND TAKING_ID = #{takingId}
+           AND USER_ID = #{userId}
+           AND GUBUN = #{gubun}
+           AND INP_DT = #{inpDt}
+    </update>
+
+</mapper>

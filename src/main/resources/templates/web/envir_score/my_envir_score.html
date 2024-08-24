@@ -1,0 +1,147 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+<head>
+    <style>
+        #pTitle{
+            text-align: center;
+        }
+        #pScore{
+            text-align: center;
+        }
+        #myPoint,#myScore {
+            font-size: 70px;
+            font-weight: bold;
+        }
+        #myPoint img{
+            vertical-align: middle;
+            width: 75px;
+            height: 75px;
+            position: relative; /* 상대적 위치 조정 */
+            top: -5px; /* 텍스트보다 10px 위로 올림 */
+        }
+        #myScore img{
+            vertical-align: middle;
+            width: 120px;
+            height: 120px;
+            position: relative; /* 상대적 위치 조정 */
+            top: -15px; /* 텍스트보다 10px 위로 올림 */
+            left: -20px;
+        }
+        .left {
+            font-size: 25px;
+            font-weight: bold;
+            color: #333;
+            position: relative;
+            left: 60px;
+        }
+        .right {
+            font-size: 25px;
+            font-weight: bold;
+            color: #333;
+            position: relative;
+            right: 60px;
+        }
+        .separator {
+            border-top: 2px solid #ccc;
+            width: 100%;
+            margin: 0 10px;
+            margin-bottom: 50px;
+        }
+        .myps{
+            display: flex;
+            justify-content: space-between; /* 자식 요소를 양 끝으로 배치 */
+            align-items: center; /* 자식 요소들을 수직으로 중앙 정렬 */
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 60px;
+        }
+    </style>
+</head>
+<div layout:fragment="content">
+    <div class="page-wrapper auth">
+        <div class="page-inner bg-brand-gradient">
+            <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                    <div class="row">
+                        <div class="col-xl-6 order-xl-1">
+                            <div class="card mb-g">
+                                <div class="card-body pb-0 px-4" style="height: 650px">
+                                    <div id="pTitle">
+                                        <h2><b>나의 환경지킴이포인트(<span id="currentYear"></span>)</b></h2>
+                                        <p id="myPoint"><span id="totalScore"></span><img th:src="@{/img/point.png}" style="margin-left: 5px;"></p>
+                                    </div>
+                                    <div class="separator"></div>
+                                    <div class="myps">
+                                        <div class="left">복용점수</div>
+                                        <div class="right"><span id="takingScore"></span>P</div>
+                                    </div>
+                                    <div class="myps">
+                                        <div class="left">배출점수</div>
+                                        <div class="right"><span id="disposalScore"></span>P</div>
+                                    </div>
+                                    <div class="myps">
+                                        <div class="left">기타점수</div>
+                                        <div class="right"><span id="etcScore"></span>P</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 order-xl-2">
+                            <div class="card mb-g">
+                                <div class="card-body pb-0 px-4" style="height: 650px">
+                                    <div id="pScore">
+                                        <div id="scoreContainer">
+                                            <h2><b>나의 환경지킴이 순위</b></h2>
+                                            <p id="myScore"><span style="font-size: 70px"><span id="totalScoreRank"></span>위</span><img th:src="@{/img/crownEarth.svg}" style="margin-left: 5px;"></p>
+                                        </div>
+                                    </div>
+                                    <div class="separator"></div>
+                                    <div class="myps">
+                                        <div class="left">복용순위</div>
+                                        <div class="right"> <span id="takingScoreRank"></span>위</div>
+                                    </div>
+                                    <div class="myps">
+                                        <div class="left">배출순위</div>
+                                        <div class="right"><span id="disposalScoreRank"></span>위</div>
+                                    </div>
+                                    <div class="myps">
+                                        <div class="left">기타순위</div>
+                                        <div class="right"><span id="etcScoreRank"></span>위</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <script src="/js/envir_score/envir_score_doughnutchart.js"></script> -->
+    <!-- <script src="/js/envir_score/envir_score_linechart.js"></script> -->
+    <script th:inline="javascript">
+
+        /* 나의점수조회 DTO */
+        /*<![CDATA[*/
+        let envirScoreDTO = JSON.parse(/*[[${jsonEnvirScoreDTO}]]*/ '{}');
+        /*]]>*/
+
+        /* 전체사용자 대비 나의 순위 분석 DTO */
+        /*<![CDATA[*/
+        let envirScoreRankDTO = JSON.parse(/*[[${jsonEnvirScoreRankDTO}]]*/ '{}');
+        /*]]>*/
+        console.log(envirScoreDTO);
+        console.log(envirScoreRankDTO);
+
+        document.getElementById('currentYear').textContent = envirScoreDTO.year;
+        document.getElementById("totalScore").textContent = envirScoreDTO.totalScore;
+        document.getElementById("takingScore").textContent = envirScoreDTO.takingAddScore + envirScoreDTO.takingEndScore;
+        document.getElementById("disposalScore").textContent = envirScoreDTO.disposalScore;
+        document.getElementById("etcScore").textContent = envirScoreDTO.etcScore;
+
+        document.getElementById("totalScoreRank").textContent = envirScoreRankDTO.totalScoreRank;
+        document.getElementById("takingScoreRank").textContent = envirScoreRankDTO.takingScoreRank;
+        document.getElementById("disposalScoreRank").textContent = envirScoreRankDTO.disposalScoreRank;
+        document.getElementById("etcScoreRank").textContent = envirScoreRankDTO.etcScoreRank;
+
+    </script>
+</div>
+</html>

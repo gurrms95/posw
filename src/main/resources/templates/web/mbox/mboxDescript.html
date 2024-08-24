@@ -1,0 +1,73 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+  <div layout:fragment="content">
+    <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${MAPKEY} + '&libraries=services,clusterer,drawing'"></script>
+    <div class="page-wrapper auth">
+      <div class="page-inner bg-brand-gradient">
+        <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+          <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">        
+            <div class="row">
+              <div class="col-xl-12">
+                <div class="card mb-g">
+                  <div class="card-body pb-0 px-4">
+                    <div class="d-flex flex-row pb-3 pt-2  border-top-0 border-left-0 border-right-0">
+                      <h2 class="mb-0 flex-1 text-dark fw-500">
+                        <b>폐의약품 분리배출</b>
+                      </h2>
+                    </div>
+                    <div class="pb-3 pt-2 border-top-0 border-left-0 border-right-0 text-muted">
+                      <h3 style="color:blue;"><b>폐의약품, 왜 소각 처리해야하나요?!!</b></h3>
+                      <div class="d-flex overflow-hidden rounded w-100 border">
+                        <div class="row no-gutters">
+                          <div class="col">
+                            <div class="bg-faded flex-1 p-4">
+                              <h3 class="m-0">
+                                <p style="font-size: 19px">
+                                폐의약품이 매립되거나 하수구로 버려질 경우, 항생물질 등 약 성분이 토양에 유입되고,
+                                빗물 등에 의해 지하수, 하천 등으로 유입될 수 있습니다.
+                                이 경우 생태계 교란과 지속적인 항생물질 노출로 내성균의 확산을 초래하는 등
+                                인간의 건강에 악영향을 끼칠 수 있어 매립이 아닌 소각 처리해야 합니다.
+                                </p>
+                              </h3>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-12">
+                <div class="card mb-g">
+                  <div class="card-body pb-0 px-4">
+                    <div class="d-flex flex-row pb-3 pt-2  border-top-0 border-left-0 border-right-0">
+                      <h2 class="mb-0 flex-1 text-dark fw-500">
+                        <b>배출방법:폐의약품 전용수거함 배출</b>
+                      </h2>
+                    </div>
+                    <div class="pb-3 pt-2 border-top-0 border-left-0 border-right-0 text-muted">
+                      <div class="d-flex overflow-hidden rounded w-100 border">
+                        <div class="row no-gutters" style="width: 100%">
+                          <div class="col">
+                            <div class="bg-faded flex-1 p-4" style="text-align: center;">
+                              <img th:src="@{/img/medic/powder.png}" style="width: 250px">
+                              <img th:src="@{/img/medic/pill_1.png}" style="width: 250px">
+                              <img th:src="@{/img/medic/pill_2.png}" style="width: 250px">
+                              <img th:src="@{/img/medic/liquid.png}" style="width: 250px">
+                              <img th:src="@{/img/medic/ointm.png}" style="width: 250px">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pb-3 pt-2 border-top-0 border-left-0 border-right-0 text-muted">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> 
+          </div> 
+        </div> 
+      </div> 
+    </div> 
+  </div>
+</html>

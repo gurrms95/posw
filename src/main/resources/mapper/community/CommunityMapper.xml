@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.omid.osw.web.community.mapper.CommunityMapper">
+    <select id="getCommunityList" resultType="CommunityDto">
+        SELECT bno
+             ,comTitle
+             ,comKind
+             ,comWriter
+             ,comContent
+             ,comHits
+             ,comLike
+             ,comRegDate
+         FROM community
+        ORDER BY comRegDate
+    </select>
+
+    <select id="getcomDetail" parameterType="int">
+        SELECT bno
+             ,comTitle
+             ,comKind
+             ,comWriter
+             ,comContent
+             ,comHits
+             ,comLike
+             ,comRegDate
+        FROM community
+        WHERE bno = #{bno}
+        ORDER BY comRegDate
+    </select>
+
+    <insert id="setCommunity" parameterType="CommunityDto">
+        INSERT INTO community
+            (bno
+            ,comTitle
+            ,comKind
+            ,comWriter
+            ,comContent
+            ,comHits
+            ,comLike)
+        VALUES
+            (#{bno}
+             ,#{comTitle}
+             ,#{comKind}
+             ,#{comWriter}
+             ,#{comContent}
+             ,#{comHits}
+             ,#{comLike})
+    </insert>
+</mapper>

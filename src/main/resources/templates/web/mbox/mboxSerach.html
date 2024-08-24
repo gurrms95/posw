@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+<head>
+  <style>
+    #result {
+      width: 100%;
+    }
+    #result article {
+      width: 100%;
+      min-height: 30px;
+      line-height: 30px;
+      padding: 0 12px;
+      border: 1px solid #ffffff;
+      background-color: #ffffff;
+      cursor: pointer;
+      word-break: break-all; /* 긴 단어를 적절히 분리 */
+      white-space: normal; /* 여러 줄 텍스트 허용 */
+      overflow: hidden; /* 넘치는 텍스트 숨기기 */
+      text-overflow: ellipsis; /* 넘치는 텍스트 생략 표시 (...) */
+    }
+    #result article:not(:last-child) { border-bottom: 0; }
+    #result article:first-child { border-radius: 4px 4px 0 0; }
+    #result article:last-child { border-radius: 0 0 4px 4px; }
+    #result article:hover {
+      background-color: #e7e7e7;
+      color: #000000;
+    }
+    #result .searching {
+      width: 100%;
+      height: 30px;
+      line-height: 30px;
+      padding: 0 12px;
+      background-color: #ffffff; color: #ff8383;
+      border-radius: 4px;
+      box-sizing: border-box; /* 패딩과 테두리를 포함하여 너비 계산 */
+    }
+    .map_wrap, .map_wrap * {margin:0;padding:0;font-family:'Malgun Gothic',dotum,'돋움',sans-serif;font-size:12px;}
+    .map_wrap a, .map_wrap a:hover, .map_wrap a:active{color:#000;text-decoration: none;}
+    .map_wrap {position:relative;width:100%;height:500px;}
+    #menu_wrap {position:absolute;top:0;left:0;bottom:0;width:285px;margin:10px 0 30px 10px;padding:5px;overflow-y:auto;background:rgba(255, 255, 255, 0.7);z-index: 1;font-size:12px;border-radius: 10px;}
+    .bg_white {background:#fff;}
+    #menu_wrap hr {display: block; height: 1px;border: 0; border-top: 2px solid #5F5F5F;margin:3px 0;}
+    #menu_wrap .option{text-align: center;}
+    #menu_wrap .option p {margin:10px 0;}
+    #menu_wrap .option button {margin-left:5px;}
+    #placesList li {list-style: none;}
+    #placesList .item {position:relative;border-bottom:1px solid #888;overflow: hidden;cursor: pointer;min-height: 65px;}
+    #placesList .item span {display: block;margin-top:4px;}
+    #placesList .item h5, #placesList .item .info {text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
+    #placesList .item .info{padding:10px 0 10px 55px;}
+    #placesList .info .gray {color:#8a8a8a;}
+    #placesList .info .jibun {padding-left:26px;background:url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png) no-repeat;}
+    #placesList .info .tel {color:#009900;}
+    #placesList .item .markerbg {float:left;position:absolute;width:36px; height:37px;margin:10px 0 0 10px; background:url(/img/marker_spot.svg) no-repeat;}
+    #pagination {margin:10px auto;text-align: center;}
+    #pagination a {display:inline-block;margin-right:10px;}
+    #pagination .on {font-weight: bold; cursor: default;color:#777;}
+  </style>
+</head>
+<body>
+<div layout:fragment="content">
+  <script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${MAPKEY} + '&libraries=services,clusterer,drawing'"></script>
+  <div class="page-wrapper auth">
+    <div class="page-inner bg-brand-gradient">
+      <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+        <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+          <div class="row">
+            <div class="col-xl-12">
+              <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                폐의약품 수거함 검색하기
+                <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60 hidden-sm-down">
+                  우리동네를 검색해주세요!
+                </small>
+              </h2>
+            </div>
+            <div class="col-xl-6 ml-auto mr-auto">
+              <div class="card p-4 rounded-plus bg-faded">
+                <form id="js-login" novalidate="" action="">
+                  <div class="form-group">
+                    <label class="form-label">Please search for the medicine Box you want to find!</label>
+                    <div class="input-group input-group-lg bg-white shadow-inset-2">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text bg-transparent border-right-0 py-1 px-3 text-success">
+                            <i class="fal fa-search"></i>
+                        </span>
+                      </div>
+                      <input id="keyword" type="text" class="form-control border-left-0 bg-transparent pl-0" placeholder="우리동네를 검색해보세요">
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div><br>
+          <div class="row">
+            <div class="col-xl-12">
+              <div class="card mb-g">
+                <div class="card-body pb-0 px-4" style="height: 630px;">
+                  <div class="map_wrap">
+                    <div id="map" style="height:600px;"></div>
+
+                    <div id="menu_wrap" class="bg_white">
+                      <ul id="placesList"></ul>
+                      <div id="pagination"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let mboxList = /*[[${WMCB}]]*/'{}';
+    let mboxData = JSON.parse(mboxList);
+    /*]]>*/
+  </script>
+  <script type="module">
+    import KakaoMapService from '/common/js/KakaoMapService.js';
+    import AjaxService from '/common/js/AjaxService.js';
+
+    let container = document.querySelectorAll("#map");
+
+    let kakaMap = new KakaoMapService();
+    let ajaxService = new AjaxService();
+    let markers = [];
+    let addToCoor = [];
+
+    //내위치 좌표찾기
+    //let myLoc =  await  kakaMap.getMyLocation();
+    let myLoc = {
+      lat:36.4854059,
+      lon:127.3016856
+    }
+
+    //좌표->주소로 변환
+    let myAddress =  await kakaMap.getCoordSearch(myLoc);
+
+    //카카오맵 실행
+    let map =  kakaMap.setKakaoMap(container,myLoc,5);
+
+    let jsonMbox = JSON.parse(mboxData.body);
+
+    $("#keyword").keydown(async function (event){
+      if(event.keyCode === 13){
+        event.preventDefault();
+        let mbox = filterMboxList($("#keyword").val());
+        let addList = [];
+
+        Object.values(mbox).forEach(function (box){
+          addList.push({"name":box['수거함 명칭'],"dAddress":box['도로명주소'],"gAddress":box['지번주소']});
+        })
+
+        //주소->좌표로 변환
+        addToCoor = await kakaMap.getAddressSearch(addList);
+
+        displayPlaces(addList);
+      }
+    });
+
+    let fiterMbox = filterMboxList(myAddress.address.region_3depth_name);
+
+    let addList = [];
+
+    Object.values(fiterMbox).forEach(function (box){
+      addList.push({"name":box['수거함 명칭'],"dAddress":box['도로명주소'],"gAddress":box['지번주소']});
+    })
+
+    //주소->좌표로 변환
+    addToCoor = await kakaMap.getAddressSearch(addList);
+
+
+    displayPlaces(addList);
+
+    function displayPlaces(places){
+      let listEl = $("#placesList");
+
+      //검색 결과 목록에 추가된 항목들을 제거
+      removeAllChildNods(listEl);
+      removeMarker();
+
+      //카카오맵에 마커넣기
+      let marker = kakaMap.setMarker(map,addToCoor);
+      let center = addToCoor[Math.round(addToCoor.length/2)];
+      let moveLatLon = new kakao.maps.LatLng(center.lat, center.lon);
+
+      map.panTo(moveLatLon);
+
+      for(let i = 0 ; i < marker.length; i++){
+        markers.push(marker[i]);
+      }
+
+      for ( var i=0; i<places.length; i++ ) {
+        let itemEl = getListItem(i, places[i]);
+        listEl.append(itemEl);
+      }
+    }
+
+    // 검색결과 항목을 Element로 반환하는 함수입니다
+    function getListItem(index, places) {
+
+      let el = $('<li></li>');
+      let itemStr = '<span class="markerbg"></span>' +
+                    '<div class="info">' +
+                    '<h5>' + places.name + '</h5>';
+
+      if (places.dAddress) {
+        itemStr += '<span>' + places.dAddress + '</span>' +
+                   '<span class="jibun gray">' +  places.gAddress  + '</span>';
+      } else {
+        itemStr += '<span>' +  places.gAddress  + '</span></div>';
+      }
+      el.html(itemStr);
+      el.addClass('item');
+
+      return el;
+    }
+
+    // 검색결과 목록의 자식 Element를 제거하는 함수입니다
+    function removeAllChildNods(el) {
+      el.empty();
+    }
+
+    // 지도 위에 표시되고 있는 마커를 모두 제거합니다
+    function removeMarker() {
+      for ( var i = 0; i < markers.length; i++ ) {
+        markers[i].setMap(null);
+      }
+      markers = [];
+    }
+
+    function filterMboxList(dong){
+     return Object.keys(jsonMbox).reduce((result,key)=>{
+        let value = jsonMbox[key];
+
+        if(typeof  value === 'object' && value !== null){
+          for (const prop in value) {
+            if (String(value[prop]).includes(dong)) {
+              result[key] = value;
+              break;
+            }
+          }
+        } else if(String(value).includes(dong)) {
+          result[key] = value;
+        }
+        return result;
+      }, {});
+    }
+  </script>
+</div>
+</body>
+</html>

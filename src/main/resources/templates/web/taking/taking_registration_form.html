@@ -1,0 +1,322 @@
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/user_layout}">
+<head>
+    <style>
+        .result {
+            width: 100%;
+        }
+        .result article {
+            width: 100%;
+            min-height: 30px;
+            line-height: 30px;
+            padding: 0 12px;
+            border: 1px solid #ffffff;
+            background-color: #ffffff;
+            cursor: pointer;
+            word-break: break-all; /* 긴 단어를 적절히 분리 */
+            white-space: normal; /* 여러 줄 텍스트 허용 */
+            overflow: hidden; /* 넘치는 텍스트 숨기기 */
+            text-overflow: ellipsis; /* 넘치는 텍스트 생략 표시 (...) */
+        }
+        .result article:not(:last-child) { border-bottom: 0; }
+        .result article:first-child { border-radius: 4px 4px 0 0; }
+        .result article:last-child { border-radius: 0 0 4px 4px; }
+        .result article:hover {
+            background-color: #e7e7e7;
+            color: #000000;
+        }
+        .result .searching {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            padding: 0 12px;
+            background-color: #ffffff; color: #ff8383;
+            border-radius: 4px;
+            box-sizing: border-box; /* 패딩과 테두리를 포함하여 너비 계산 */
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-wrapper auth">
+            <div class="page-inner bg-brand-gradient">
+                <div class="flex-1" style="background: url(/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <h2 class="fs-xxl fw-500 mt-4 text-white text-center">
+                                    복용약 등록
+                                    <small class="h3 fw-300 mt-3 mb-5 text-white opacity-60 hidden-sm-down">
+                                        복용할 약을 검색 후 등록해주세요!
+                                    </small>
+                                </h2>
+                            </div>
+                            <div class="col-xl-6 ml-auto mr-auto">
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    <form id="taking-regist-form">
+                                        <div class="medicine-formdiv-1">
+                                            <div class="form-group row">
+                                                <div class="col-12 pr-1">
+                                                    <label class="form-label" for="taking-nm">복용명</label>
+                                                    <div class="input-group bg-white shadow-inset-2">
+                                                        <input type="text" id="taking-nm" class="form-control" data-invalid-feedback="복용명을 입력해주세요." required>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-6 pr-1">
+                                                    <label class="form-label" for="medi-nm-1">약품 검색</label>
+                                                    <div class="input-group bg-white shadow-inset-2">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-transparent border-right-0 py-1 px-3 text-success">
+                                                                <i class="fal fa-search"></i>
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" id="medi-nm-1" class="form-control border-left-0 bg-transparent pl-0" placeholder="약품을 검색해보세요." data-invalid-feedback="약품을 검색 후 클릭하세요." required>
+                                                    </div>
+                                                    <div id="result-1" class="result"></div>
+                                                </div>
+                                                <div class="col-6 pr-1">
+                                                    <label class="form-label" for="taking-start-dt-1">복용 시작일</label>
+                                                    <div class="input-group">
+                                                        <input type="date" id="taking-start-dt-1" class="form-control">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <div class="col-3 pr-1">
+                                                    <label class="form-label" for="all-taking-dt-1">총 투약 일</label>
+                                                    <input type="number" id="all-taking-dt-1" class="form-control" data-invalid-feedback="총 투약 일 입력해주세요." required>
+                                                </div>
+                                                <div class="col-3 pr-1">
+                                                    <label class="form-label" for="drug-content-1">함량</label>
+                                                    <input type="number" id="drug-content-1" class="form-control">
+                                                </div>
+                                                <div class="col-3 pl-1">
+                                                    <label class="form-label" for="daily-dose-1">1회 투약량</label>
+                                                    <input type="number" id="daily-dose-1" class="form-control">
+                                                </div>
+                                                <div class="col-3 pl-1">
+                                                    <label class="form-label" for="daily-dose-cnt-1">1일 투약 횟수</label>
+                                                    <input type="number" id="daily-dose-cnt-1" class="form-control" data-invalid-feedback="1일 투약 횟수를 입력해주세요."  required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label" for="memo-1">메모하기</label>
+                                                <textarea class="form-control" id="memo-1" rows="5"></textarea>
+                                            </div>
+                                         </div>
+                                        <button type="button" id="add-medicine" class="btn btn-xs btn-default waves-effect waves-themed btn-block mt-3 mb-4">
+                                            <i class="fas fa-plus-circle"></i>
+                                        </button>
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-success waves-effect waves-themed btn-block">등록하기</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .btn-block {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+            }
+            .btn-outline-secondary i {
+                margin-right: 0.5rem;
+            }
+            .mt-3 {
+                margin-top: 1rem !important;
+            }
+            .mb-4 {
+                margin-bottom: 1.5rem !important;
+            }
+        </style>
+        <script type="module">
+            const { fromEvent, from, merge } = rxjs;
+            const { ajax } = rxjs.ajax;
+            const { mergeMap, switchMap, pluck, retry, map, filter, debounceTime, distinctUntilChanged, mapTo, scan, tap } = rxjs.operators;
+
+            import FormService from '/common/js/FormService.js';
+            import MessageService from '/common/js/MessageService.js';
+            import AjaxService from '/common/js/AjaxService.js';
+
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+            const ajaxService = new AjaxService();
+
+            let takingRegistFormService;
+            let messageService;
+            let takingRegistForm;
+            let medicineCount = 1;
+
+            document.addEventListener('DOMContentLoaded', function() {
+                takingRegistFormService = new FormService('taking-regist-form');
+                messageService = new MessageService();
+                takingRegistForm = takingRegistFormService.getFormValues();
+
+                const searchFunction = (inputId, resultId) => {
+                    const keyword = document.querySelector(`${inputId}`);
+                    const result = document.querySelector(`${resultId}`);
+                    const url = '/taking/getSearch';
+
+                    const searchInit$ = fromEvent(keyword, 'keyup').pipe(
+                        filter(event => event.code !== 'Backspace'),
+                        pluck('target', 'value'),
+                        filter(typed => typed.length > 1),
+                        debounceTime(500),
+                        distinctUntilChanged()
+                    );
+
+                    const searching$ = searchInit$.pipe(
+                        mapTo('<div class="searching">Searching...</div>')
+                    );
+
+                    const searchResult$ = searchInit$.pipe(
+                        switchMap(typed =>
+                            ajax({
+                                url: url,
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json',[csrfHeader]: csrfToken },
+                                body: JSON.stringify({ itemName: typed })
+                            }).pipe(retry(3))
+                        ),
+                        pluck('response'),
+                        mergeMap(results => {
+                            if (results === null || results === "") {
+                                return from([`<article class="no-results">찾으시는 약이 없습니다</article>`]);
+                            } else {
+                                return from(results).pipe(
+                                    mergeMap(result => {
+                                        const itemName = result.itemName.includes('/') ? result.itemName.split('/') : [result.itemName];
+                                        return from(itemName);
+                                    }),
+                                    map(itemName => `<article>${itemName}</article>`),
+                                    tap(val => console.log(val)),
+                                    scan((acc, article) => acc + article, '')
+                                );
+                            }
+                        })
+                    );
+
+                    merge(searching$, searchResult$).subscribe(el => {
+                        result.innerHTML = el;
+
+                        const articles = result.querySelectorAll('article');
+                        articles.forEach(article => {
+                            if (!article.classList.contains('no-results')) {
+                                article.addEventListener('click', () => {
+                                    const itemName = article.textContent;
+                                    keyword.value = itemName;
+                                    result.innerHTML = '';
+                                });
+                            }
+                        });
+                    });
+                };
+
+                searchFunction('#medi-nm-1', '#result-1');
+
+                document.querySelector('#add-medicine').addEventListener('click', function () {
+                    medicineCount++;
+                    const newMedicineForm = `
+                        <hr>
+                        <div class="medicine-formdiv-${medicineCount}">
+                            <div class="form-group row">
+                                <div class="col-6 pr-1">
+                                    <label class="form-label" for="medi-nm-${medicineCount}">약품 검색</label>
+                                    <div class="input-group bg-white shadow-inset-2">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text bg-transparent border-right-0 py-1 px-3 text-success">
+                                                <i class="fal fa-search"></i>
+                                            </span>
+                                        </div>
+                                        <input type="text" id="medi-nm-${medicineCount}" class="form-control border-left-0 bg-transparent pl-0" placeholder="약품을 검색해보세요." data-invalid-feedback="약품을 검색 후 클릭하세요." required>
+                                    </div>
+                                    <div id="result-${medicineCount}" class="result"></div>
+                                </div>
+                                 <div class="col-6 pr-1">
+                                    <label class="form-label" for="taking-start-dt-${medicineCount}">복용 시작일</label>
+                                    <div class="input-group">
+                                        <input type="date" id="taking-start-dt-${medicineCount}" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-3 pr-1">
+                                    <label class="form-label" for="all-taking-dt-${medicineCount}">총 투약 일</label>
+                                    <input type="number" id="all-taking-dt-${medicineCount}" class="form-control" required>
+                                </div>
+                                <div class="col-3 pr-1">
+                                    <label class="form-label" for="drug-content-${medicineCount}">함량</label>
+                                    <input type="text" id="drug-content-${medicineCount}" class="form-control">
+                                </div>
+                                <div class="col-3 pl-1">
+                                    <label class="form-label" for="daily-dose-${medicineCount}">1회 투약량</label>
+                                    <input type="text" id="daily-dose-${medicineCount}" class="form-control">
+                                </div>
+                                <div class="col-3 pl-1">
+                                    <label class="form-label" for="daily-dose-cnt-${medicineCount}">1일 투약 횟수</label>
+                                    <input type="text" id="daily-dose-cnt-${medicineCount}" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="memo-${medicineCount}">메모하기</label>
+                                <textarea class="form-control" id="memo-${medicineCount}" rows="5"></textarea>
+                            </div>
+                        </div>
+                        `;
+                    document.querySelector(`.medicine-formdiv-${medicineCount-1}`).insertAdjacentHTML('beforeend', newMedicineForm);
+                    searchFunction(`#medi-nm-${medicineCount}`, `#result-${medicineCount}`);
+                    takingRegistFormService = new FormService('taking-regist-form'); // 새로 추가된 폼 필드 재초기화
+                });
+
+                document.querySelector('#taking-regist-form').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const isValid = takingRegistFormService.onValidation();
+                    if (isValid) {
+                        const formData = [];
+                        const takingNm = document.querySelector('#taking-nm').value;
+                        document.querySelectorAll('[id^="medi-nm-"]').forEach((element, index) => {
+                           const mediCnt = index + 1;
+                           const takingData = {
+                               takingNm: takingNm,
+                               mediNm: document.querySelector(`#medi-nm-${mediCnt}`).value,
+                               takingStartDt: document.querySelector(`#taking-start-dt-${mediCnt}`).value,
+                               allTakingDt: document.querySelector(`#all-taking-dt-${mediCnt}`).value,
+                               drugContent: document.querySelector(`#drug-content-${mediCnt}`).value,
+                               dailyDose: document.querySelector(`#daily-dose-${mediCnt}`).value,
+                               dailyDoseCnt: document.querySelector(`#daily-dose-cnt-${mediCnt}`).value,
+                               memo: document.querySelector(`#memo-${mediCnt}`).value
+                           };
+                            formData.push(takingData);
+                        });
+
+                        ajaxService.request('/taking/insertTaking', 'POST', formData)
+                            .then(response => response.text())
+                            .then(data => {
+                                alert('복용중인 약 ' + data);
+                                messageService.showSuccess(data, '복용중인 약');
+                                console.log('Success:', data);
+                                window.location.href = '/taking/scheduleList';
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                            });
+                    }
+                })
+            });
+        </script>
+    </div>
+</body>
+</html>
