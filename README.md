@@ -148,8 +148,7 @@
 |-----------|--------------------------------------------------------|
 | Language  | Java: OpenJDK 17 <br> HTML5 <br> CSS3 <br> JavaScript  |
 | Database  | MariaDB                                     |
-| Framework | Spring Boot: 3.3.0 <br> MyBatis <br> Thymeleaf |
-| System    | Windows: 10 Pro                                        |
+| Framework | Spring Boot: 3.3.0 <br> MyBatis <br> Thymeleaf |                                 |
 | Tool      | GitHub <br> Git Bash <br> MySQL Workbench: 8.0 <br>|
 | Server    | Tomcat: Provided by Spring Boot <br> AWS               |
 | Libraries | Gson: 2.10.1 <br> Jackson Databind: 2.16.1 <br> Jackson JSR310: 2.16.1 <br> Jackson XML: 2.16.1 <br> Log4j2 <br> Google Cloud Vision: 3.34.0 <br> Springdoc OpenAPI UI: 1.6.14 <br> Apache Commons Exec: 1.3 <br> Apache HttpClient 5: 5.2.1 |
