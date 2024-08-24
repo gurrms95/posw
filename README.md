@@ -7,11 +7,6 @@
 
 <img src="src/main/resources/static/images/readme/readme_main.png" alt="readme_main" width="1000px" height="550px" />
 
-<br>
-
-- 배포 URL : 미정
-- Test ID : 미정
-- Test PW : 미정
 
 <br>
 
